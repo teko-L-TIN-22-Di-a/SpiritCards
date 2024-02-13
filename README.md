@@ -1,8 +1,12 @@
 # SpiritCards
 
-A school project made by Benny Schärer and Celin Villars.
+A school project authored by Benny Schärer and Celin Villars.
 
 ## Project Setup
+
+The initial Project setup is done but it is still missing a lot of parts that may or may not be added in the future. Some Points:
+- Add proper makefile support?
+- Test and or configure proper pyproject.toml
 
 > ! This setup guide is targeted towards windows.
 
@@ -30,7 +34,7 @@ py run.py
 
 At the moment there is only a batch script that builds the app into the "run.dist" folder using the Nuitka builder.
 Nuitka compiles and builds the python project into a ".exe" file.
-For the build to be successful the script copies the asset folder and all its contents into the "run.dist" folder.
+For the build to be successful the script copies the "assets" folder and all its contents into the "run.dist" folder.
 
 ```
 start build.cmd
