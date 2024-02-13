@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=42", "wheel", "nuitka", "toml"]
+build-backend = "nuitka.distutils.Build"
+
+[general]
+module = "run.py"
+
+[options]
+standalone = true
+
+[include]
+assets = ["assets/*"]
+
+[tool.setuptools]
+packages = ["spirit_cards"]
+
+[project]
+name = "Spirit Cards"
+version = "0.0.1"
+dependencies = ["pygame"]
+requires-python = ">=3.11.8"
+authors = [
+    {name = "Benny Schärer"},
+    {name = "Celin Villars"}
+]
+description = "Not filled in yet."
+
+[project.gui-scripts]
+newgemu = "spirit_cards.main:main"
+
+[project.urls]
+Repository = "https://github.com/me/spam.git"
