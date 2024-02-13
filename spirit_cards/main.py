@@ -1,32 +1,54 @@
 import pygame
 
-def main():
-    pygame.init()
-    surface = pygame.display.set_mode((1280, 720))
-    icon = pygame.Surface((32, 32))
-    icon.fill(pygame.Color(0,0,0))
+from .core.engine import Engine
+from .constants import *
 
-    pygame.display.set_icon(icon)
-    clock = pygame.time.Clock()
+from .example_code.example_scene import ExampleScene
+
+def main():
     running = True
 
+    pygame.init()
+    clock = pygame.time.Clock()
+    surface = pygame.display.set_mode((1280, 720))
+    
+    icon = pygame.Surface((32, 32))
+    icon.fill(pygame.Color(0,0,0))
+    
+    # For testing
     sheet = pygame.image.load("assets/link_sprite_sheet.png")
     rect = sheet.get_rect()
     bounding_rect = pygame.rect.Rect(0, 0, 92, 112)
+    # remove above code
 
-    while running:
+    engine = Engine({
+        PYGAME_SURFACE: surface
+    })
+    # Todo add proper scene initialisation
+    engine.load_scene(ExampleScene(engine.context))
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+    try:
+        while running:
 
-        surface.fill("black")
-        surface.blit(sheet, rect, bounding_rect)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
 
-        pygame.display.update()
-        pygame.display.flip()
+            # TODO Add proper delta
+            engine.process(1)
 
-        clock.tick(60)
+            # For testing
+            surface.fill("black")
+            surface.blit(sheet, rect, bounding_rect)
+            # remove above code
+
+            pygame.display.update()
+            pygame.display.flip()
+
+            clock.tick(60)
+    except:
+        print("Game ungracefully stopped because of an exception")
+        raise
 
     pygame.quit()
 
