@@ -1,4 +1,4 @@
-from .entity import Entity
+from spirit_cards.core.entity import Entity
 
 class EntityManager:
     

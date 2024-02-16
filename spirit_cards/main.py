@@ -1,56 +1,36 @@
-import pygame
-
-from .core.engine import Engine
-from .constants import *
-
-from .example_code.example_scene import ExampleScene
+from spirit_cards.constants import FRAME_RATE
+from spirit_cards.main_scenes.load_scene.load_scene import LoadScene, LoadSceneParameters
+from spirit_cards.pygame_extension.pygame_engine import PygameConfiguration, PygameEngine
+from spirit_cards.example_code.example_scene import ExampleScene
+from spirit_cards.services.asset_manager import AssetManager
+from spirit_cards.services.global_services import ASSET_MANAGER
 
 def main():
-    running = True
 
-    pygame.init()
-    clock = pygame.time.Clock()
-    surface = pygame.display.set_mode((1280, 720))
-    
-    icon = pygame.Surface((32, 32))
-    icon.fill(pygame.Color(0,0,0))
-    
-    # For testing
-    sheet = pygame.image.load("assets/link_sprite_sheet.png")
-    rect = sheet.get_rect()
-    bounding_rect = pygame.rect.Rect(0, 0, 92, 112)
-    # remove above code
-
-    engine = Engine({
-        PYGAME_SURFACE: surface
+    engine = PygameEngine({
+        ASSET_MANAGER: AssetManager()
     })
-    # Todo add proper scene initialisation
-    engine.load_scene(ExampleScene(engine.context))
+
+    configuration = PygameConfiguration(
+        start_scene = LoadScene,
+        start_scene_parameters = LoadSceneParameters(
+            scene = ExampleScene,
+            load_files = {
+                "test": "image"
+            }
+        ),
+        frame_rate = FRAME_RATE
+    )
+
+    print(f"Starting PygameEngine with the following parameters:\n{vars(configuration)}")
 
     try:
-        while running:
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-            # TODO Add proper delta
-            engine.process(1)
-
-            # For testing
-            surface.fill("black")
-            surface.blit(sheet, rect, bounding_rect)
-            # remove above code
-
-            pygame.display.update()
-            pygame.display.flip()
-
-            clock.tick(60)
+        engine.run(configuration)
     except:
         print("Game ungracefully stopped because of an exception")
         raise
-
-    pygame.quit()
+    
+    engine.cleanup
 
 if __name__ == "__main__":
     main()

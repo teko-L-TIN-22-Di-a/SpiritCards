@@ -5,6 +5,9 @@ class Context:
     def __init__(self, serviceConfiguration: dict[str, any]):
         self._all_services = serviceConfiguration
 
+    def set_service(self, key: str, service: any) -> any:
+        self._all_services[key] = service
+
     def get_service(self, key: str) -> any:
         if key not in self._all_services:
             raise Exception(f"Service with key {key} not registered!")

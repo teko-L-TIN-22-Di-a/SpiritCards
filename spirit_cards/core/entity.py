@@ -1,9 +1,9 @@
 class Entity:
 
-    def update(self, delta: int) -> None:
+    def update(self, delta: float) -> None:
         pass
 
-    def render(self, delta: int) -> None:
+    def render(self, delta: float) -> None:
         pass
 
     def cleanup(self) -> None:
