@@ -1,8 +1,8 @@
 from spirit_cards.asset_map import MONTSERRAT_24, TEST_SPRITE_SHEET, TEST_TILE
 from spirit_cards.constants import FRAME_RATE
 from spirit_cards.example_code.secondary_scene import SecondaryScene
-from spirit_cards.main_scenes.load_scene.asset_loader import FONT_SIZE, AssetLoadConfiguration
-from spirit_cards.main_scenes.load_scene.load_scene import LoadScene, LoadSceneParameters
+from spirit_cards.pygame_extension.load_scene.asset_loader import FONT_SIZE, AssetLoadConfiguration
+from spirit_cards.pygame_extension.load_scene.load_scene import LoadScene, LoadSceneParameters
 from spirit_cards.pygame_extension.pygame_engine import PygameConfiguration, PygameEngine
 from spirit_cards.example_code.example_scene import ExampleScene
 from spirit_cards.services.asset_manager import AssetManager, AssetType

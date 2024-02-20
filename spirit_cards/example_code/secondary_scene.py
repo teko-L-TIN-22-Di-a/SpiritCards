@@ -1,18 +1,13 @@
 import random
 import pygame
-from spirit_cards.asset_map import MONTSERRAT_24, TEST_SPRITE_SHEET, TEST_TILE
-from spirit_cards.pygame_extension.event_buffer import EventBuffer
-
-from spirit_cards.pygame_extension.pygame_services import *
+from spirit_cards.asset_map import MONTSERRAT_24, TEST_TILE
 from spirit_cards.core.scene import Scene
+
+from spirit_cards.pygame_extension.event_buffer import EventBuffer
+from spirit_cards.pygame_extension.pygame_services import EVENT_BUFFER, SCREEN_SURFACE
+from spirit_cards.scenes.gathering_scenes.isometric_tile_map import IsometricTileMap
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.services.global_services import ASSET_MANAGER
-
-class Tile:
-    y: int = 1
-
-    def __init__(self, y):
-        self.y = y
 
 class SecondaryScene(Scene):
 
@@ -21,10 +16,10 @@ class SecondaryScene(Scene):
     _font: pygame.font.Font
     _texture: pygame.surface.Surface
 
-    _tile_map: list[list[Tile]]
-    _map_surface: pygame.Surface
+    _tile_map: IsometricTileMap
 
-    _offset = (0, 0)
+    _offset: pygame.Vector2 = pygame.Vector2(0, 0)
+    _thingy: pygame.Vector3 = pygame.Vector3(0, 1, 0)
 
     def init(self, parameters: any = None) -> None:
         asset_manager: AssetManager = self.context.get_service(ASSET_MANAGER)
@@ -34,60 +29,65 @@ class SecondaryScene(Scene):
 
         self._font = asset_manager.get_font(MONTSERRAT_24)
 
-        # self._tile_map = [[Tile(random.randrange(10, 15)/10) for z in range(0,5)] for x in range(0,5)]
-        map_size = (5,5)
-        self._tile_map = [[Tile(1) for z in range(0,map_size[1])] for x in range(0,map_size[0])]
+        tile_size = pygame.Vector2(self._texture.get_size())
+        self._tile_map = IsometricTileMap((5,2), (tile_size.x, 190, tile_size.y))
 
-        # Prerender map
-
-        tile_size = self._texture.get_size()
-        half_size = (
-            tile_size[0]/2, 
-            48 #tile_size[1]/4
-        )
-
-        map_surface_size = (
-            map_size[0]*half_size[0] + map_size[1]*half_size[0], 
-            max(map_size[0], map_size[1]) * half_size[1]*2 + tile_size[1] - half_size[1]
-        )
-
-        self._map_surface = pygame.surface.Surface((map_surface_size[0], map_surface_size[1]), pygame.SRCALPHA)
-        start_offset = (map_surface_size[0]- map_size[1]*half_size[0]-half_size[0], 0)
-
-        for x, row in enumerate(self._tile_map):
-            for z, item in enumerate(row):
-
-                x_part = (half_size[0]*x, half_size[1]*x)
-                z_part = (half_size[0]*-z, half_size[1]*z)
-                y_part = (0, half_size[1]*item.y)
-                xyz_pos = (x_part[0] + z_part[0] + y_part[0], x_part[1] + z_part[1] + y_part[1])
-
-                pos = (xyz_pos[0] + start_offset[0], xyz_pos[1] + start_offset[1])
-                self._map_surface.blit(self._texture, pos)
+        print("Prerendering Map")
+        self._pre_draw_map()
+        print("Finished Prerendering")
 
     def process(self, delta: int) -> None:
 
         speed = 10
 
+        # Map + debug camera
         pressed_keys = pygame.key.get_pressed()
         if(pressed_keys[pygame.K_w]):
-            self._offset = (self._offset[0], self._offset[1]+speed)
+            self._offset.y += speed
         if(pressed_keys[pygame.K_s]):
-            self._offset = (self._offset[0], self._offset[1]-speed)
+            self._offset.y -= speed
         if(pressed_keys[pygame.K_a]):
-            self._offset = (self._offset[0]+speed, self._offset[1])
+            self._offset.x += speed
         if(pressed_keys[pygame.K_d]):
-            self._offset = (self._offset[0]-speed, self._offset[1])
+            self._offset.x -= speed
 
-        tile_size = self._texture.get_size()
-        half_size = (tile_size[0]/2, tile_size[1]/4)
+        center = pygame.Vector2(self._surface.get_size()) / 2
+        
+        map_texture = self._tile_map.get_map_texture()
+        map_offset = pygame.Vector2(map_texture.get_size()) / -2 + center + self._offset
+        self._surface.blit(self._tile_map.get_map_texture(), map_offset)
 
-        self._surface.fill(pygame.Color(50,50,50))
         text = self._font.render("Heyo", True, "White")
         self._surface.blit(text, (4, 4))
+        pygame.draw.circle(self._surface, "Red", center, 10, 4)
 
-        self._surface.blit(self._map_surface, self._offset)
-        
+        temp_movement = pygame.Vector3(0,0,0)
+
+        # Pseudo player
+        if(pressed_keys[pygame.K_UP]):
+            temp_movement.z -= 1
+        if(pressed_keys[pygame.K_DOWN]):
+            temp_movement.z += 1
+        if(pressed_keys[pygame.K_LEFT]):
+            temp_movement.x -= 1
+        if(pressed_keys[pygame.K_RIGHT]):
+            temp_movement.x += 1
+
+        if(temp_movement.length() != 0):
+            self._thingy += temp_movement.rotate_y(45).normalize() * 0.1
+
+        thingy_pos = self._tile_map.to_screen_space(self._thingy) + map_offset
+        pygame.draw.circle(self._surface, "Cyan", thingy_pos, 24, 8)
+
+    def _pre_draw_map(self) -> None:
+        surface = self._tile_map.get_map_texture()
+
+        tile_offset = self._tile_map.tile_size.xy / -2
+
+        for x, row in enumerate(self._tile_map.tile_map):
+            for z, item in enumerate(row):
+                screen_pos = self._tile_map.to_screen_space(pygame.Vector3(x, item.position.y, z))
+                surface.blit(self._texture, screen_pos + tile_offset)
 
     def cleanup(self) -> None:
         pass

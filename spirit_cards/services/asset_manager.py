@@ -26,6 +26,10 @@ class AssetManager:
         return self.get_asset_type_safe(key, pygame.font.Font)
     
     def get_asset_type_safe(self, key: str, asset_type: type) -> any:
+
+        if(key not in self._asset_map):
+            raise Exception(f"AssetManager | Failed to Load '{key}'")
+
         asset = self._asset_map[key]
 
         if type(asset) is asset_type: return asset

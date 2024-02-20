@@ -7,7 +7,7 @@ from spirit_cards.core.engine_services import SCENE_SWITCHER
 
 from spirit_cards.core.scene import Scene
 from spirit_cards.core.scene_switcher import SceneSwitcher
-from spirit_cards.main_scenes.load_scene.asset_loader import LoadThread
+from spirit_cards.pygame_extension.load_scene.asset_loader import LoadThread
 from spirit_cards.pygame_extension.pygame_services import EVENT_BUFFER, SCREEN_SURFACE
 from spirit_cards.services.asset_manager import AssetManager, AssetType
 from spirit_cards.services.global_services import ASSET_MANAGER
@@ -49,7 +49,8 @@ class LoadScene(Scene):
             self._thread.join()
             self._scene_switcher.load_scene(self._parameters.scene(self.context), self._parameters.scene_parameters)
 
-        text = self._font.render("Loading...", True, "White")
+
+        text = self._font.render("...", True, "White")
         self._surface.blit(text, (4, 4))
 
     def cleanup(self) -> None:

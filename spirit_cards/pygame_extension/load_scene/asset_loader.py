@@ -7,7 +7,9 @@ from threading import Thread
 from spirit_cards.services.asset_manager import AssetType
 
 DEFAULT_FONT_SIZE = 16
+
 FONT_SIZE = "font_size"
+CONVERT_ALPHA_ENABLED = "convert_alpha_enabled"
 
 @dataclass
 class AssetLoadConfiguration:
@@ -22,7 +24,13 @@ class AssetLoader():
             
             if(load_entries[entry].type == AssetType.Image):
                 print(f"LoadThread | Loading image '{entry}'")
-                load_results[entry] = pygame.image.load(entry)
+                parse_parameters = load_entries[entry].parse_parameters
+
+                if(parse_parameters[CONVERT_ALPHA_ENABLED] if hasattr(parse_parameters, CONVERT_ALPHA_ENABLED) else True):
+                    load_results[entry] = pygame.image.load(entry).convert_alpha()
+                else:
+                    load_results[entry] = pygame.image.load(entry)
+                
                 continue
 
             if(load_entries[entry].type == AssetType.Font):
