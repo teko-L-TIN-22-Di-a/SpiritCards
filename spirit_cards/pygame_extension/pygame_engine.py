@@ -1,5 +1,6 @@
-from dataclasses import dataclass
 import pygame
+
+from dataclasses import dataclass
 
 from spirit_cards.core.engine import Engine
 from spirit_cards.core.scene import Scene
