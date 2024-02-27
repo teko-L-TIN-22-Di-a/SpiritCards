@@ -1,5 +1,5 @@
 
-from spirit_cards.card_engine.action import Action
+from spirit_cards.card_engine.action import Action, ActionInstance, Actions
 from spirit_cards.card_engine.board_context import BoardContext
 from spirit_cards.card_engine.requirement import Requirement
 from spirit_cards.card_engine.round_context import RoundContext
@@ -30,8 +30,8 @@ class RoundState(State):
     next_phase = None
 
     buffered_action: Action = None
-    action_stack: list[Action] = []
-    requirements_stack: list[Requirement] = []
+    action_stack: list[ActionInstance] = []
+    requirements_stack: list[ActionInstance] = []
 
     round_context: RoundContext
     board_context: BoardContext
@@ -60,6 +60,8 @@ class RoundState(State):
             self.resolve_requirement_stack()
             self.action_stack.append(self.buffered_action)
             self.buffered_action = None
+
+        # TODO Implement way of resolving single requirements
 
     def process_action(self):
         if(len(self.action_stack) > 0):
@@ -98,7 +100,7 @@ class RoundState(State):
 class RefreshPhase(RoundState):
 
     def enter(self, msg: dict) -> None:
-        self.action_stack.append(Action(Action.ON_REFRESH, source=Action.SYSTEM_SOURCE))
+        self.action_stack.append(Actions[Action.ON_REFRESH].new_instance(ActionInstance.SYSTEM_SOURCE))
 
     def update(self) -> None:
         self.process_actions(RoundState.MAIN_PHASE)
@@ -121,7 +123,7 @@ class MainPhase2(RoundState):
 class EndPhase(RoundState):
     
     def enter(self, msg: dict) -> None:
-        self.action_stack.append(Action(Action.ON_END, source=Action.SYSTEM_SOURCE))
+        self.action_stack.append(Actions[Action.ON_END].new_instance(ActionInstance.SYSTEM_SOURCE))
 
     def update(self) -> None:
         self.process_actions(RoundState.REFRESH_PHASE)
