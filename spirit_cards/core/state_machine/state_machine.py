@@ -33,6 +33,10 @@ class StateMachine:
 
         self.transition_to(inital_state)
 
+    def update(self) -> None:
+        if(self.current_state is not None):
+            self.current_state.update()
+
     def transition_to(self, state_key: str, msg: dict = {}) -> None:
         
         if(state_key not in self._states):

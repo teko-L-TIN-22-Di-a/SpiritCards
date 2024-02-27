@@ -4,10 +4,10 @@ from spirit_cards.asset_map import MONTSERRAT_24, TEST_TILE
 from spirit_cards.core.scene import Scene
 
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
-from spirit_cards.pygame_extension.pygame_services import EVENT_BUFFER, SCREEN_SURFACE
+from spirit_cards.pygame_extension.pygame_services import PygameServices
 from spirit_cards.scenes.gathering_scenes.isometric_tile_map import IsometricTileMap
 from spirit_cards.services.asset_manager import AssetManager
-from spirit_cards.services.global_services import ASSET_MANAGER
+from spirit_cards.services.global_services import GlobalServices
 
 class SecondaryScene(Scene):
 
@@ -22,9 +22,9 @@ class SecondaryScene(Scene):
     _thingy: pygame.Vector3 = pygame.Vector3(0, 1, 0)
 
     def init(self, parameters: any = None) -> None:
-        asset_manager: AssetManager = self.context.get_service(ASSET_MANAGER)
-        self._event_buffer = self.context.get_service(EVENT_BUFFER)
-        self._surface = self.context.get_service(SCREEN_SURFACE)
+        asset_manager: AssetManager = self.context.get_service(GlobalServices.ASSET_MANAGER)
+        self._event_buffer = self.context.get_service(PygameServices.EVENT_BUFFER)
+        self._surface = self.context.get_service(PygameServices.SCREEN_SURFACE)
         self._texture = asset_manager.get_image(TEST_TILE)
 
         self._font = asset_manager.get_font(MONTSERRAT_24)

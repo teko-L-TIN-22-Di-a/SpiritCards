@@ -3,14 +3,14 @@ import pygame
 
 from dataclasses import dataclass
 
-from spirit_cards.core.engine_services import SCENE_SWITCHER
+from spirit_cards.core.engine_services import EngineServices
 
 from spirit_cards.core.scene import Scene
 from spirit_cards.core.scene_switcher import SceneSwitcher
 from spirit_cards.pygame_extension.load_scene.asset_loader import LoadThread
-from spirit_cards.pygame_extension.pygame_services import EVENT_BUFFER, SCREEN_SURFACE
+from spirit_cards.pygame_extension.pygame_services import PygameServices
 from spirit_cards.services.asset_manager import AssetManager, AssetType
-from spirit_cards.services.global_services import ASSET_MANAGER
+from spirit_cards.services.global_services import GlobalServices
 
 @dataclass
 class LoadSceneParameters:
@@ -33,9 +33,9 @@ class LoadScene(Scene):
     def init(self, parameters: LoadSceneParameters) -> None:
         self._parameters = parameters
 
-        self._scene_switcher = self.context.get_service(SCENE_SWITCHER)
-        self._surface = self.context.get_service(SCREEN_SURFACE)
-        self._asset_manager = self.context.get_service(ASSET_MANAGER)
+        self._scene_switcher = self.context.get_service(EngineServices.SCENE_SWITCHER)
+        self._surface = self.context.get_service(PygameServices.SCREEN_SURFACE)
+        self._asset_manager = self.context.get_service(GlobalServices.ASSET_MANAGER)
 
         self._font = pygame.font.SysFont('timesnewroman',  24)
 

@@ -1,1 +1,3 @@
-ASSET_MANAGER = "AssetManager"
+
+class GlobalServices:
+    ASSET_MANAGER = "AssetManager"

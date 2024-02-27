@@ -2,17 +2,17 @@ from spirit_cards.asset_map import MONTSERRAT_24, TEST_SPRITE_SHEET, TEST_TILE
 from spirit_cards.constants import FRAME_RATE
 from spirit_cards.example_code.board_prototype_scene import BoardPrototypeScene
 from spirit_cards.example_code.secondary_scene import SecondaryScene
-from spirit_cards.pygame_extension.load_scene.asset_loader import FONT_SIZE, AssetLoadConfiguration
+from spirit_cards.pygame_extension.load_scene.asset_loader import FontLoadParams, AssetLoadConfiguration
 from spirit_cards.pygame_extension.load_scene.load_scene import LoadScene, LoadSceneParameters
 from spirit_cards.pygame_extension.pygame_engine import PygameConfiguration, PygameEngine
 from spirit_cards.example_code.example_scene import ExampleScene
 from spirit_cards.services.asset_manager import AssetManager, AssetType
-from spirit_cards.services.global_services import ASSET_MANAGER
+from spirit_cards.services.global_services import GlobalServices
 
 def main():
 
     engine = PygameEngine({
-        ASSET_MANAGER: AssetManager()
+        GlobalServices.ASSET_MANAGER: AssetManager()
     })
 
     configuration = PygameConfiguration(
@@ -23,7 +23,7 @@ def main():
                 TEST_SPRITE_SHEET: AssetLoadConfiguration(type=AssetType.Image),
                 TEST_TILE: AssetLoadConfiguration(type=AssetType.Image),
 
-                MONTSERRAT_24: AssetLoadConfiguration(type=AssetType.Font, parse_parameters={FONT_SIZE: 24})
+                MONTSERRAT_24: AssetLoadConfiguration(type=AssetType.Font, parse_parameters={FontLoadParams.FONT_SIZE: 24})
             }
         ),
         frame_rate = FRAME_RATE

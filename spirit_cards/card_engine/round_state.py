@@ -1,40 +1,86 @@
 
+from spirit_cards.card_engine.action import Action
+from spirit_cards.card_engine.board_context import BoardContext
+from spirit_cards.card_engine.round_context import RoundContext
 from spirit_cards.core.state_machine.state_machine import State, StateMachine
 
-REFRESH_PHASE = "refresh_phase"
-MAIN_PHASE = "main_phase"
-BATTLE_PHASE = "battle_phase"
-MAIN_PHASE_2 = "main_phase_2"
-END_PHASE = "end_phase"
-
 class RoundState(State):
-    pass
+    
+    REFRESH_PHASE = "refresh_phase"
+    MAIN_PHASE = "main_phase"
+    BATTLE_PHASE = "battle_phase"
+    MAIN_PHASE_2 = "main_phase_2"
+    END_PHASE = "end_phase"
 
-class RoundStateMachine(StateMachine):
+    action_stack: list[Action]
 
-    def __init__(self):
+    round_context: RoundContext
+    board_context: BoardContext
+
+    def __init__(self, round_context: RoundContext, board_context: BoardContext):
+        self.round_context = round_context
+        self.board_context = board_context
+
+    def process_effects(self):
+        # Go through filtered list of cards on board and execute effects.
+        pass
+
+    def request_action(self):
+        if(self.action_stack.count() > 0):
+            return
+        
+        # Get Action
+        pass
+
+    def request_reaction(self):
+        if(self.action_stack.count() <= 0):
+            return
+        
+        if(self.action_stack[-1].key == Action.NO_ACT):
+            self.resolve_action_stack()
+
+        # Get Reaction
+        
+    def resolve_action_stack(self):
+        pass
+        
+
+
+class RoundStateHandler(StateMachine):
+
+    def __init__(self, round_context: RoundContext, board_context: BoardContext):
 
         states = {
-            REFRESH_PHASE: RefreshPhase(),
-            MAIN_PHASE: MainPhase(),
-            BATTLE_PHASE: BattlePhase(),
-            MAIN_PHASE_2: MainPhase2(),
-            END_PHASE: EndPhase(),
+            RoundState.REFRESH_PHASE: RefreshPhase(round_context, board_context),
+            RoundState.MAIN_PHASE: MainPhase(round_context, board_context),
+            RoundState.BATTLE_PHASE: BattlePhase(round_context, board_context),
+            RoundState.MAIN_PHASE_2: MainPhase2(round_context, board_context),
+            RoundState.END_PHASE: EndPhase(round_context, board_context),
         }
 
-        super().__init__(states, REFRESH_PHASE)
+        super().__init__(states, RoundState.REFRESH_PHASE)
 
 class RefreshPhase(RoundState):
-    pass
+    
+    def update(self) -> None:
+        pass
 
 class MainPhase(RoundState):
-    pass
+    
+    def update(self) -> None:
+        pass
 
 class BattlePhase(RoundState):
-    pass
+    
+    def update(self) -> None:
+        pass
 
 class MainPhase2(RoundState):
-    pass
+    
+    def update(self) -> None:
+        pass
 
 class EndPhase(RoundState):
-    pass
+    
+    def update(self) -> None:
+        pass

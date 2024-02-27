@@ -5,6 +5,7 @@ A school project authored by Benny Schärer and Celin Villars.
 ## Project Setup
 
 The initial Project setup is done but it is still missing a lot of parts that may or may not be added in the future. Some Points:
+
 - Add proper makefile support?
 - Test and or configure proper pyproject.toml
 
@@ -16,18 +17,21 @@ Setup venv
 
 ```
 py -m venv
+python -m venv .
 ```
 
 Install all dependencies
 
 ```
 py -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ## Local development
 
 ```
 py run.py
+python
 ```
 
 ## Build for distribution

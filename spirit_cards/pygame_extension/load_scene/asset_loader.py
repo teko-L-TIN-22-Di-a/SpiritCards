@@ -8,8 +8,11 @@ from spirit_cards.services.asset_manager import AssetType
 
 DEFAULT_FONT_SIZE = 16
 
-FONT_SIZE = "font_size"
-CONVERT_ALPHA_ENABLED = "convert_alpha_enabled"
+class FontLoadParams:
+    FONT_SIZE = "font_size"
+
+class ImageLoadParams:
+    CONVERT_ALPHA_ENABLED = "convert_alpha_enabled"
 
 @dataclass
 class AssetLoadConfiguration:
@@ -26,7 +29,7 @@ class AssetLoader():
                 print(f"LoadThread | Loading image '{entry}'")
                 parse_parameters = load_entries[entry].parse_parameters
 
-                if(parse_parameters[CONVERT_ALPHA_ENABLED] if hasattr(parse_parameters, CONVERT_ALPHA_ENABLED) else True):
+                if(parse_parameters[ImageLoadParams.CONVERT_ALPHA_ENABLED] if hasattr(parse_parameters, ImageLoadParams.CONVERT_ALPHA_ENABLED) else True):
                     load_results[entry] = pygame.image.load(entry).convert_alpha()
                 else:
                     load_results[entry] = pygame.image.load(entry)
@@ -36,7 +39,7 @@ class AssetLoader():
             if(load_entries[entry].type == AssetType.Font):
                 print(f"LoadThread | Loading font '{entry}'")
                 parse_parameters = load_entries[entry].parse_parameters
-                font_size = parse_parameters[FONT_SIZE] if parse_parameters[FONT_SIZE] is not None else DEFAULT_FONT_SIZE
+                font_size = parse_parameters[FontLoadParams.FONT_SIZE] if parse_parameters[FontLoadParams.FONT_SIZE] is not None else DEFAULT_FONT_SIZE
                 load_results[entry] = pygame.font.Font(entry, font_size)
                 continue
 

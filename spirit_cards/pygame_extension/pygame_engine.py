@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from spirit_cards.core.engine import Engine
 from spirit_cards.core.scene import Scene
 
-from spirit_cards.pygame_extension.pygame_services import *
+from spirit_cards.pygame_extension.pygame_services import PygameServices
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
 
 @dataclass
@@ -43,8 +43,8 @@ class PygameEngine:
         event_buffer = EventBuffer()
 
         self.engine = Engine({
-            SCREEN_SURFACE: surface,
-            EVENT_BUFFER: event_buffer,
+            PygameServices.SCREEN_SURFACE: surface,
+            PygameServices.EVENT_BUFFER: event_buffer,
             **self._startup_services
         })
 

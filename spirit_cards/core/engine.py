@@ -11,7 +11,7 @@ class Engine(SceneSwitcher):
     def __init__(self, services: dict[str,any]):
         self.context = Context(services)
 
-        self.context.set_service(SCENE_SWITCHER, self)
+        self.context.set_service(EngineServices.SCENE_SWITCHER, self)
 
     def load_scene(self, scene: Scene, parameters: any = None) -> None:
         if self.current_scene is not None: 
@@ -21,7 +21,7 @@ class Engine(SceneSwitcher):
         print(f"Engine | transitioning to scene {type(scene).__name__}")
         print("Engine | with parameters: " + ("None" if parameters is None else str(vars(parameters))))
         self.current_scene = scene
-        self.context.set_service(CURRENT_SCENE, scene)
+        self.context.set_service(EngineServices.CURRENT_SCENE, scene)
         self.current_scene.init(parameters)
         print(f"Engine | init {type(scene).__name__} success")
 

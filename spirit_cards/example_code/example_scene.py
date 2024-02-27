@@ -19,10 +19,10 @@ class ExampleScene(Scene):
 
     def init(self, parameters: any = None) -> None:
 
-        self._scene_switcher = self.context.get_service(SCENE_SWITCHER)
+        self._scene_switcher = self.context.get_service(EngineServices.SCENE_SWITCHER)
 
-        self._surface = self.context.get_service(SCREEN_SURFACE)
-        self._event_buffer = self.context.get_service(EVENT_BUFFER)
+        self._surface = self.context.get_service(PygameServices.SCREEN_SURFACE)
+        self._event_buffer = self.context.get_service(PygameServices.EVENT_BUFFER)
 
         self._font = pygame.font.SysFont('timesnewroman',  24)
 
