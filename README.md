@@ -16,8 +16,8 @@ Install a python version below '3.12' because of Nuitka compatibility issues. (B
 Setup venv
 
 ```
-py -m venv
-python -m venv .
+py -m venv .venv
+python -m venv .venv
 ```
 
 Install all dependencies
