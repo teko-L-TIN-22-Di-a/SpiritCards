@@ -5,17 +5,17 @@ from spirit_cards.card_engine.round_state import RoundState, RoundStateHandler
 
 class CardEngine:
     
-    _board_context: BoardContext
-    _round_context: RoundContext
+    board_context: BoardContext
+    round_context: RoundContext
 
-    _round_state: RoundStateHandler
+    round_state: RoundStateHandler
 
     def __init__(self, starting_player, player2):
-        self._board_context = BoardContext()
-        self._round_context = RoundContext(starting_player, player2)
-        self._round_state = RoundStateHandler(self._round_context, self._board_context)
+        self.board_context = BoardContext()
+        self.round_context = RoundContext(starting_player, player2)
+        self.round_state = RoundStateHandler(self.round_context, self.board_context)
 
     def update(self) -> None:
-        self._round_state.update()
+        self.round_state.update()
         
 

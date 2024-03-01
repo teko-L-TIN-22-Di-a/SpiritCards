@@ -1,5 +1,5 @@
 import pygame
-from spirit_cards.asset_map import MONTSERRAT_24
+from spirit_cards.asset_map import MONTSERRAT_24, TEST_CARD
 from spirit_cards.card_engine.card_engine import CardEngine
 from spirit_cards.card_engine.card_player import CardPlayer
 
@@ -25,6 +25,7 @@ class BoardPrototypeScene(Scene):
     _card_engine: CardEngine
 
     _font: pygame.font.Font
+    _card_texture: pygame.surface.Surface
 
     def init(self, parameters: any = None) -> None:
 
@@ -36,6 +37,8 @@ class BoardPrototypeScene(Scene):
         asset_manager: AssetManager = self.context.get_service(GlobalServices.ASSET_MANAGER)
         self._font = asset_manager.get_font(MONTSERRAT_24)
 
+        self._card_texture = asset_manager.get_image(TEST_CARD)
+
         player1 = CardPlayer()
         player2 = CardPlayer()
 
@@ -43,14 +46,26 @@ class BoardPrototypeScene(Scene):
 
     def process(self, delta: int) -> None:
 
-        # for e in self._event_buffer.get_events():
-        #     if(e.type == pygame.KEYDOWN and e.key == pygame.K_2):
-        #         print("switching scene")
-        #         self._scene_switcher.load_scene(SecondaryScene(self.context))
-
         self._surface.fill("White")
+
+        card_rect = pygame.Rect(24, 24, 185, 256)
+        mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
+
+        if(card_rect.collidepoint(mouse_pos.x, mouse_pos.y)):
+                    pygame.draw.rect(self._surface, "green", card_rect)
+
+        # for e in self._event_buffer.get_events():
+        #     if(e.type == pygame.MOUSEMOTION):
+        #         print(e.dict)
+        #         mouse_pos = pygame.Vector2(e.dict["pos"])
+
+        #         if(card_rect.collidepoint(mouse_pos.x, mouse_pos.y)):
+        #             pygame.draw.rect(self._surface, "green", card_rect)
+
         text = self._font.render(str(delta), True, "Black")
         self._surface.blit(text, (4, 4))
+
+        self._surface.blit(pygame.transform.scale(self._card_texture, (185, 256)), (24,24))
 
         self._card_engine.update()
 
