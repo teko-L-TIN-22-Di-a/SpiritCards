@@ -6,6 +6,8 @@ from spirit_cards.pygame_extension.load_scene.asset_loader import FontLoadParams
 from spirit_cards.pygame_extension.load_scene.load_scene import LoadScene, LoadSceneParameters
 from spirit_cards.pygame_extension.pygame_engine import PygameConfiguration, PygameEngine
 from spirit_cards.example_code.example_scene import ExampleScene
+from spirit_cards.scenes.encounter_scenes.encounter_scene import EncounterScene
+from spirit_cards.scenes.gathering_scenes.gathering_scene import GatheringScene
 from spirit_cards.services.asset_manager import AssetManager, AssetType
 from spirit_cards.services.global_services import GlobalServices
 
@@ -18,7 +20,7 @@ def main():
     configuration = PygameConfiguration(
         start_scene = LoadScene,
         start_scene_parameters = LoadSceneParameters(
-            scene = BoardPrototypeScene,
+            scene = EncounterScene,
             load_files = {
                 AssetMap.TEST_SPRITE_SHEET: AssetLoadConfiguration(type=AssetType.Image),
                 AssetMap.TEST_TILE: AssetLoadConfiguration(type=AssetType.Image),

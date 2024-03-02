@@ -55,14 +55,14 @@ class BoardSide(UIComponent):
 
         for slot in slots:
             if(slot.get_inner_rect().collidepoint(mouse_pos.x, mouse_pos.y)):
-                pygame.draw.rect(board_surface, "Green", slot.get_inner_rect())
+                pygame.draw.rect(board_surface, "Green", slot.get_inner_rect(), border_radius=4)
 
             pygame.draw.rect(board_surface, "#5A798C", slot.get_inner_rect(), 2, 4)
             board_surface.blit(pygame.transform.scale(self._card_texture, slot.get_inner_rect().size), slot.get_inner_rect())
 
         for slot in self.hand_zone.slots_components:
             if(slot.get_inner_rect().collidepoint(mouse_pos.x, mouse_pos.y)):
-                pygame.draw.rect(board_surface, "Green", slot.get_inner_rect())
+                pygame.draw.rect(board_surface, "Green", slot.get_inner_rect(), border_radius=4)
             board_surface.blit(pygame.transform.scale(self._card_texture, slot.get_inner_rect().size), slot.get_inner_rect())
 
         pygame.draw.circle(board_surface, "red", mouse_pos, 8, 2)
