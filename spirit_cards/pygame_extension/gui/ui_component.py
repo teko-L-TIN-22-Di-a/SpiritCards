@@ -33,5 +33,13 @@ class UIComponent:
             return self.rect.copy().move(relative_pos.x, relative_pos.y)
         
         return self.rect.copy()
+    
+    def get_inner_rect(self) -> pygame.Rect:
+        rect = self.get_rect()
+        return pygame.Rect(
+            rect.left + self.margin.x,
+            rect.top + self.margin.y,
+            rect.width - self.margin.x*2,
+            rect.height - self.margin.y*2)
 
 

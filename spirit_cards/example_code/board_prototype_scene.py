@@ -54,12 +54,9 @@ class BoardPrototypeScene(Scene):
 
     def process(self, delta: int) -> None:
 
-        self._surface.fill("White")
+        self._surface.fill("#BABABF")
 
         self._board.render(delta)
-
-        text = self._font.render(str(delta), True, "Black")
-        self._surface.blit(text, (4, 4))
 
         card_rect = pygame.Rect(24, 24, 185, 256)
         mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
@@ -75,6 +72,10 @@ class BoardPrototypeScene(Scene):
 
         # self._surface.blit(pygame.transform.rotate(self._card_texture, 180), (24,24))
         # self._surface.blit(self._card_texture, (24,24))
+
+        text = self._font.render(str(int(delta*60)), True, "Black")
+        pygame.draw.rect(self._surface, "White", pygame.Rect(0,0,text.get_size()[0] + 8, text.get_size()[1] + 8))
+        self._surface.blit(text, (4, 4))
 
         return
 
