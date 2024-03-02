@@ -10,12 +10,14 @@ class Board(Entity):
 
     BOARD_SPACE_BETWEEN = 32
 
+    _context: Context
     _surface: pygame.surface.Surface
 
     player1_side: BoardSide
     player2_side: BoardSide
 
     def __init__(self, context: Context):
+        self._context = context
         self._surface = context.get_service(PygameServices.SCREEN_SURFACE)
         self._initialize_components()
 
@@ -23,8 +25,15 @@ class Board(Entity):
         pass
 
     def render(self, delta: float) -> None:
-        self._surface.blit(pygame.transform.rotate(self.player2_side.draw_to_surface(), 180), self.player2_side.get_rect())
-        self._surface.blit(self.player1_side.draw_to_surface(), self.player1_side.get_rect())
+
+        mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
+        
+        player1_mouse_pos = mouse_pos - pygame.Vector2(self.player1_side.rect.topleft)
+        board_center = self.player2_side.get_rect().center
+        player2_mouse_pos = (mouse_pos - board_center).rotate(180) + board_center
+
+        self._surface.blit(pygame.transform.rotate(self.player2_side.draw_to_surface(player2_mouse_pos), 180), self.player2_side.get_rect())
+        self._surface.blit(self.player1_side.draw_to_surface(player1_mouse_pos), self.player1_side.get_rect())
 
     def _initialize_components(self):
         screen_size = pygame.Vector2(self._surface.get_size())
@@ -34,11 +43,11 @@ class Board(Entity):
         )
 
         self.player1_side = BoardSide(pygame.Rect(
+            0,board_size.y + Board.BOARD_SPACE_BETWEEN,
+            board_size.x, board_size.y   
+        ), self._context)
+        self.player2_side = BoardSide(pygame.Rect(
             0,0,
             board_size.x, board_size.y   
-        ))
-        self.player2_side = BoardSide(pygame.Rect(
-            0,self.player1_side.get_rect().bottom + Board.BOARD_SPACE_BETWEEN,
-            board_size.x, board_size.y   
-        ))
+        ), self._context)
         

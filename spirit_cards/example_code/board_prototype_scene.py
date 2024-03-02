@@ -39,7 +39,7 @@ class BoardPrototypeScene(Scene):
 
         self._font = asset_manager.get_font(AssetMap.MONTSERRAT_24)
 
-        self._card_texture = pygame.transform.smoothscale(asset_manager.get_image(AssetMap.TEST_CARD), (185, 256))
+        self._card_texture = pygame.transform.scale(asset_manager.get_image(AssetMap.TEST_CARD), (185, 256))
 
         self._scoped_context = ScopedContext(self.context, {
               
@@ -58,22 +58,22 @@ class BoardPrototypeScene(Scene):
 
         self._board.render(delta)
 
-        card_rect = pygame.Rect(24, 24, 185, 256)
-        mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
+        # card_rect = pygame.Rect(24, 24, 185, 256)
+        # mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
 
-        if(card_rect.collidepoint(mouse_pos.x, mouse_pos.y)):
-            pygame.draw.rect(self._surface, "green", card_rect)
-            beeg_card = pygame.transform.scale_by(self._card_texture, 2)
-            screen_center = pygame.Vector2(self._surface.get_rect().center)
-            card_center = pygame.Vector2(beeg_card.get_rect().center)
-            self._surface.blit(beeg_card,screen_center - card_center)
+        # if(card_rect.collidepoint(mouse_pos.x, mouse_pos.y)):
+        #     pygame.draw.rect(self._surface, "green", card_rect)
+        #     beeg_card = pygame.transform.scale_by(self._card_texture, 2)
+        #     screen_center = pygame.Vector2(self._surface.get_rect().center)
+        #     card_center = pygame.Vector2(beeg_card.get_rect().center)
+        #     self._surface.blit(beeg_card,screen_center - card_center)
 
-        self._surface.blit(self._card_texture, (24,24))
+        # self._surface.blit(pygame.transform.rotate(self._card_texture, 180), (24,24))
 
         # self._surface.blit(pygame.transform.rotate(self._card_texture, 180), (24,24))
         # self._surface.blit(self._card_texture, (24,24))
 
-        text = self._font.render(str(int(delta*60)), True, "Black")
+        text = self._font.render(str(int((1/delta)*60)), True, "Black")
         pygame.draw.rect(self._surface, "White", pygame.Rect(0,0,text.get_size()[0] + 8, text.get_size()[1] + 8))
         self._surface.blit(text, (4, 4))
 
