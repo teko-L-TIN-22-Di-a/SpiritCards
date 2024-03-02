@@ -1,93 +1,55 @@
-import random
 import pygame
-from spirit_cards.asset_map import MONTSERRAT_24, TEST_TILE
+from spirit_cards.asset_map import AssetMap
+from spirit_cards.core.context import ScopedContext
+from spirit_cards.core.entity_manager import EntityManager
 from spirit_cards.core.scene import Scene
 
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
 from spirit_cards.pygame_extension.pygame_services import PygameServices
+from spirit_cards.scenes.gathering_scenes.follow_camera import FollowCamera
+from spirit_cards.scenes.gathering_scenes.gathering_player import GatheringPlayer
+from spirit_cards.scenes.gathering_scenes.gathering_services import GatheringServices
+from spirit_cards.scenes.gathering_scenes.isometric_entity import IsometricEntity
 from spirit_cards.scenes.gathering_scenes.isometric_tile_map import IsometricTileMap
+from spirit_cards.scenes.gathering_scenes.tile_map_renderer import TileMapRenderer
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.services.global_services import GlobalServices
 
-class SecondaryScene(Scene):
+class IsometricTestScene(Scene):
 
+    _scoped_context: ScopedContext
     _event_buffer: EventBuffer
     _surface: pygame.Surface
+
+    _entity_manager: EntityManager
+
     _font: pygame.font.Font
-    _texture: pygame.surface.Surface
-
-    _tile_map: IsometricTileMap
-
-    _offset: pygame.Vector2 = pygame.Vector2(0, 0)
-    _thingy: pygame.Vector3 = pygame.Vector3(0, 1, 0)
 
     def init(self, parameters: any = None) -> None:
         asset_manager: AssetManager = self.context.get_service(GlobalServices.ASSET_MANAGER)
+        
         self._event_buffer = self.context.get_service(PygameServices.EVENT_BUFFER)
         self._surface = self.context.get_service(PygameServices.SCREEN_SURFACE)
-        self._texture = asset_manager.get_image(TEST_TILE)
+        self._font = asset_manager.get_font(AssetMap.MONTSERRAT_24)
 
-        self._font = asset_manager.get_font(MONTSERRAT_24)
+        self._entity_manager = EntityManager()
+        self._scoped_context = ScopedContext(self.context, {
+            GatheringServices.ENTITY_MANAGER: self._entity_manager
+        })
 
-        tile_size = pygame.Vector2(self._texture.get_size())
-        self._tile_map = IsometricTileMap((5,2), (tile_size.x, 190, tile_size.y))
-
-        print("Prerendering Map")
-        self._pre_draw_map()
-        print("Finished Prerendering")
+        self._entity_manager.register(FollowCamera(self._scoped_context), [FollowCamera.TAG])
+        self._entity_manager.register(TileMapRenderer(self._scoped_context))
+        self._entity_manager.register(GatheringPlayer(self._scoped_context), [IsometricEntity.TAG])
 
     def process(self, delta: int) -> None:
+    
+        self.entity_manager.update(delta)
+        self.entity_manager.render(delta)
 
-        speed = 10
-
-        # Map + debug camera
-        pressed_keys = pygame.key.get_pressed()
-        if(pressed_keys[pygame.K_w]):
-            self._offset.y += speed
-        if(pressed_keys[pygame.K_s]):
-            self._offset.y -= speed
-        if(pressed_keys[pygame.K_a]):
-            self._offset.x += speed
-        if(pressed_keys[pygame.K_d]):
-            self._offset.x -= speed
-
-        center = pygame.Vector2(self._surface.get_size()) / 2
-        
-        map_texture = self._tile_map.get_map_texture()
-        map_offset = pygame.Vector2(map_texture.get_size()) / -2 + center + self._offset
-        self._surface.blit(self._tile_map.get_map_texture(), map_offset)
-
-        text = self._font.render("Heyo", True, "White")
-        self._surface.blit(text, (4, 4))
-        pygame.draw.circle(self._surface, "Red", center, 10, 4)
-
-        temp_movement = pygame.Vector3(0,0,0)
-
-        # Pseudo player
-        if(pressed_keys[pygame.K_UP]):
-            temp_movement.z -= 1
-        if(pressed_keys[pygame.K_DOWN]):
-            temp_movement.z += 1
-        if(pressed_keys[pygame.K_LEFT]):
-            temp_movement.x -= 1
-        if(pressed_keys[pygame.K_RIGHT]):
-            temp_movement.x += 1
-
-        if(temp_movement.length() != 0):
-            self._thingy += temp_movement.rotate_y(45).normalize() * 0.1
-
-        thingy_pos = self._tile_map.to_screen_space(self._thingy) + map_offset
-        pygame.draw.circle(self._surface, "Cyan", thingy_pos, 24, 8)
-
-    def _pre_draw_map(self) -> None:
-        surface = self._tile_map.get_map_texture()
-
-        tile_offset = self._tile_map.tile_size.xy / -2
-
-        for x, row in enumerate(self._tile_map.tile_map):
-            for z, item in enumerate(row):
-                screen_pos = self._tile_map.to_screen_space(pygame.Vector3(x, item.position.y, z))
-                surface.blit(self._texture, screen_pos + tile_offset)
+        # text = self._font.render("Heyo", True, "White")
+        # self._surface.blit(text, (4, 4))
+        # pygame.draw.circle(self._surface, "Red", center, 10, 4)
 
     def cleanup(self) -> None:
-        pass
+        self._scoped_context.cleanup()
+        self._entity_manager.cleanup()

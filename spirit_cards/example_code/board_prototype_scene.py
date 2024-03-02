@@ -1,5 +1,5 @@
 import pygame
-from spirit_cards.asset_map import MONTSERRAT_24, TEST_CARD
+from spirit_cards.asset_map import AssetMap
 from spirit_cards.card_engine.card_engine import CardEngine
 from spirit_cards.card_engine.card_player import CardPlayer
 
@@ -10,7 +10,7 @@ from spirit_cards.core.scene_switcher import SceneSwitcher
 from spirit_cards.pygame_extension.pygame_services import *
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
 
-from spirit_cards.example_code.isometric_test_scene import SecondaryScene
+from spirit_cards.example_code.isometric_test_scene import IsometricTestScene
 from spirit_cards.scenes.encounter_scenes.board_components.board import Board, BoardConfiguration
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.services.global_services import GlobalServices
@@ -36,9 +36,9 @@ class BoardPrototypeScene(Scene):
         self._event_buffer = self.context.get_service(PygameServices.EVENT_BUFFER)
 
         asset_manager: AssetManager = self.context.get_service(GlobalServices.ASSET_MANAGER)
-        self._font = asset_manager.get_font(MONTSERRAT_24)
+        self._font = asset_manager.get_font(AssetMap.MONTSERRAT_24)
 
-        self._card_texture = pygame.transform.smoothscale(asset_manager.get_image(TEST_CARD), (185, 256))
+        self._card_texture = pygame.transform.smoothscale(asset_manager.get_image(AssetMap.TEST_CARD), (185, 256))
 
         player1 = CardPlayer()
         player2 = CardPlayer()

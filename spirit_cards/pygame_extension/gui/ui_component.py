@@ -17,7 +17,7 @@ class UIComponent:
             self.margin = margin
 
     def get_pos(self) -> pygame.Vector2:
-        pos = pygame.Vector2(self.rect.topright)
+        pos = pygame.Vector2(self.rect.topleft)
 
         if(self.relative_to is not None):
             return self.relative_to.get_pos() + pos

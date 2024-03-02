@@ -7,7 +7,7 @@ from spirit_cards.core.scene_switcher import SceneSwitcher
 from spirit_cards.pygame_extension.pygame_services import *
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
 
-from spirit_cards.example_code.isometric_test_scene import SecondaryScene
+from spirit_cards.example_code.isometric_test_scene import IsometricTestScene
 
 class ExampleScene(Scene):
 
@@ -31,7 +31,7 @@ class ExampleScene(Scene):
         for e in self._event_buffer.get_events():
             if(e.type == pygame.KEYDOWN and e.key == pygame.K_2):
                 print("switching scene")
-                self._scene_switcher.load_scene(SecondaryScene(self.context))
+                self._scene_switcher.load_scene(IsometricTestScene(self.context))
 
         self._surface.fill("White")
         text = self._font.render(str(delta), True, "Black")
