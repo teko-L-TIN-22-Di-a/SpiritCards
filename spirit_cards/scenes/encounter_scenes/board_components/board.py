@@ -17,6 +17,11 @@ class BoardConfiguration:
 
 class BoardSide:
 
+    board_component: UIComponent
+    battle_zone: UIComponent
+    support_zone: UIComponent
+    hand_zone: UIComponent
+
     battle_slots: list[Slot]
     support_slots: list[Slot]
     hand_slots: list[Slot]
@@ -25,6 +30,46 @@ class BoardSide:
         self.battle_slots = [Slot() for x in range(0, config.battle_slot_count)]
         self.support_slots = [Slot() for x in range(0, config.support_slot_count)]
         self.hand_slots = []
+
+    def init_sizes(self, screen_size: pygame.Vector2):
+        margin = 24
+        card_size = pygame.Vector2((185, 256))
+        board_space_between = 64
+
+        #TODO add Grave add Deck
+
+        self.board_component = UIComponent(pygame.Rect(
+            0,0,
+            screen_size.x,
+            screen_size.y / 2 - board_space_between / 2
+        ))
+
+        self.battle_zone = UIComponent(pygame.Rect(
+            0,0,
+            pygame.Vector2(self.board_component.get_rect().size).x * 0.64,
+            pygame.Vector2(self.board_component.get_rect().size).y * 0.55
+        ))
+
+        self.support_zone = UIComponent(pygame.Rect(
+            0, self.battle_zone.get_rect().bottom,
+            pygame.Vector2(self.board_component.get_rect().size).x * 0.28,
+            pygame.Vector2(self.board_component.get_rect().size).y * 0.45,
+        ))
+        self.hand_zone = UIComponent(pygame.Rect(
+            self.support_zone.get_rect().right, self.battle_zone.get_rect().bottom,
+            pygame.Vector2(self.board_component.get_rect().size).x * 0.72,
+            pygame.Vector2(self.board_component.get_rect().size).y * 0.45
+        ))
+
+    def get_test(self) -> pygame.Surface:
+        board_surface = pygame.Surface(self.board_component.get_rect().size)
+        
+        pygame.draw.rect(board_surface, "Blue", self.board_component.get_rect())
+        pygame.draw.rect(board_surface, "Green", self.battle_zone.get_rect())
+        pygame.draw.rect(board_surface, "Red", self.support_zone.get_rect())
+        pygame.draw.rect(board_surface, "Cyan", self.hand_zone.get_rect())
+
+        return board_surface
 
 class Board(Entity):
 
@@ -38,56 +83,23 @@ class Board(Entity):
         if(config is None):
             config = BoardConfiguration()
 
+        self._surface = context.get_service(PygameServices.SCREEN_SURFACE)
+
         self.player1_side = BoardSide(config)
+        self.player1_side.init_sizes(pygame.Vector2(self._surface.get_size()))
         self.player2_side = BoardSide(config)
-
-        self._surface = self.context.get_service(PygameServices.SCREEN_SURFACE)
-
-        self._init_sizes(context)
+        self.player2_side.init_sizes(pygame.Vector2(self._surface.get_size()))
 
     def update(self, delta: float) -> None:
         pass
 
     def render(self, delta: float) -> None:
-        pass
 
-    def _init_sizes(self, context: Context) -> None:
-        
-        margin = 24
-        card_size = pygame.Vector2((185, 256))
-        board_space_between = 124
-        
-        size = pygame.Vector2(self._surface.get_size())
+        board_space_between = 64
 
-        board_size = pygame.Vector2(
-            
-        )
+        self._surface.blit(pygame.transform.rotate(self.player2_side.get_test(), 180), (0,0))
+        self._surface.blit(self.player1_side.get_test(), (0,self.player2_side.board_component.get_rect().size[1] + board_space_between))
 
-        hand_zone_size = pygame.Vector2(
-            board_size.x * 0.36,
-            board_size.y * 0.8
-        )
-        #TODO add Grave add Deck
-
-        board_component = UIComponent(pygame.Rect(
-            0,0,
-            size.x,
-            size.y / 2 - board_space_between
-        ))
-
-        battle_zone = UIComponent(pygame.Rect(
-            0,0,
-            board_size.x * 0.64,
-            board_size.y * 1.2
-        ))
-
-        support_zone = UIComponent(pygame.Rect(
-            0,
-            battle_zone.get_rect().bottom,
-            board_size.x * 0.28,
-            board_size.y * 0.8,
-        ))
-
-        
+        pygame.draw.rect(self._surface, "pink", pygame.Rect(0,0, 64, 64))
 
         

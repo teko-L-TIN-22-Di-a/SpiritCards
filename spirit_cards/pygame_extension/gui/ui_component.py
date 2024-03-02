@@ -7,7 +7,7 @@ class UIComponent:
 
     margin: pygame.Vector2 = pygame.Vector2(0,0)
 
-    _rect: pygame.Rect
+    rect: pygame.Rect
 
     def __init__(self, rect, margin: pygame.Vector2 = None, relative_to = None):
         self.rect = rect
