@@ -1,0 +1,3 @@
+
+class SlotComponent:
+    pass

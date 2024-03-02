@@ -10,7 +10,8 @@ from spirit_cards.core.scene_switcher import SceneSwitcher
 from spirit_cards.pygame_extension.pygame_services import *
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
 
-from spirit_cards.example_code.secondary_scene import SecondaryScene
+from spirit_cards.example_code.isometric_test_scene import SecondaryScene
+from spirit_cards.scenes.encounter_scenes.board_components.board import Board, BoardConfiguration
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.services.global_services import GlobalServices
 from spirit_cards.pygame_extension.pygame_services import PygameServices
@@ -37,12 +38,14 @@ class BoardPrototypeScene(Scene):
         asset_manager: AssetManager = self.context.get_service(GlobalServices.ASSET_MANAGER)
         self._font = asset_manager.get_font(MONTSERRAT_24)
 
-        self._card_texture = asset_manager.get_image(TEST_CARD)
+        self._card_texture = pygame.transform.smoothscale(asset_manager.get_image(TEST_CARD), (185, 256))
 
         player1 = CardPlayer()
         player2 = CardPlayer()
-
+        
         self._card_engine = CardEngine(player1, player2)
+
+        board = Board()
 
     def process(self, delta: int) -> None:
 
@@ -65,7 +68,8 @@ class BoardPrototypeScene(Scene):
         text = self._font.render(str(delta), True, "Black")
         self._surface.blit(text, (4, 4))
 
-        self._surface.blit(pygame.transform.scale(self._card_texture, (185, 256)), (24,24))
+        self._surface.blit(pygame.transform.rotate(self._card_texture, 180), (24,24))
+        # self._surface.blit(self._card_texture, (24,24))
 
         self._card_engine.update()
 

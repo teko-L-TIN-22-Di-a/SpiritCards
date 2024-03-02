@@ -7,7 +7,7 @@ from spirit_cards.core.scene_switcher import SceneSwitcher
 from spirit_cards.pygame_extension.pygame_services import *
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
 
-from spirit_cards.example_code.secondary_scene import SecondaryScene
+from spirit_cards.example_code.isometric_test_scene import SecondaryScene
 
 class ExampleScene(Scene):
 

@@ -1,7 +1,7 @@
 from spirit_cards.asset_map import MONTSERRAT_24, TEST_CARD, TEST_SPRITE_SHEET, TEST_TILE
 from spirit_cards.constants import FRAME_RATE
 from spirit_cards.example_code.board_prototype_scene import BoardPrototypeScene
-from spirit_cards.example_code.secondary_scene import SecondaryScene
+from spirit_cards.example_code.isometric_test_scene import SecondaryScene
 from spirit_cards.pygame_extension.load_scene.asset_loader import FontLoadParams, AssetLoadConfiguration
 from spirit_cards.pygame_extension.load_scene.load_scene import LoadScene, LoadSceneParameters
 from spirit_cards.pygame_extension.pygame_engine import PygameConfiguration, PygameEngine
@@ -18,7 +18,7 @@ def main():
     configuration = PygameConfiguration(
         start_scene = LoadScene,
         start_scene_parameters = LoadSceneParameters(
-            scene = BoardPrototypeScene,
+            scene = SecondaryScene,
             load_files = {
                 TEST_SPRITE_SHEET: AssetLoadConfiguration(type=AssetType.Image),
                 TEST_TILE: AssetLoadConfiguration(type=AssetType.Image),
