@@ -16,6 +16,9 @@ class UIComponent:
         if(margin is not None):
             self.margin = margin
 
+    def get_surface(self) -> pygame.Surface:
+        pass
+
     def get_pos(self) -> pygame.Vector2:
         pos = pygame.Vector2(self.rect.topleft)
 

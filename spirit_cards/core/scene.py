@@ -3,7 +3,6 @@ from spirit_cards.core.context import Context
 
 class Scene:
 
-    entity_manager: EntityManager = EntityManager()
     context: Context
 
     def __init__(self, context: Context):

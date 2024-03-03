@@ -28,11 +28,10 @@ class Board(Entity):
 
         mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
         
+        player2_mouse_pos = mouse_pos - pygame.Vector2(self.player2_side.rect.topleft)
         player1_mouse_pos = mouse_pos - pygame.Vector2(self.player1_side.rect.topleft)
-        board_center = self.player2_side.get_rect().center
-        player2_mouse_pos = (mouse_pos - board_center).rotate(180) + board_center
 
-        self._surface.blit(pygame.transform.rotate(self.player2_side.draw_to_surface(player2_mouse_pos), 180), self.player2_side.get_rect())
+        self._surface.blit(self.player2_side.draw_to_surface(player2_mouse_pos, True), self.player2_side.get_rect())
         self._surface.blit(self.player1_side.draw_to_surface(player1_mouse_pos), self.player1_side.get_rect())
 
     def _initialize_components(self):
