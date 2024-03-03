@@ -43,8 +43,8 @@ class GatheringScene(Scene):
 
     def process(self, delta: int) -> None:
     
-        self.entity_manager.update(delta)
-        self.entity_manager.render(delta)
+        self._entity_manager.update(delta)
+        self._entity_manager.render(delta)
 
         # FPS viewer
         text = self._font.render(str(int((1/delta)*60)), True, "Black")

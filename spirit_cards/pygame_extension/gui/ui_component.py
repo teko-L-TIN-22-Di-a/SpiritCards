@@ -19,6 +19,9 @@ class UIComponent:
     def get_surface(self) -> pygame.Surface:
         pass
 
+    def update(self) -> pygame.Surface:
+        pass
+
     def get_pos(self) -> pygame.Vector2:
         pos = pygame.Vector2(self.rect.topleft)
 
