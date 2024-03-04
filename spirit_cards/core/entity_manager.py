@@ -2,8 +2,12 @@ from spirit_cards.core.entity import Entity
 
 class EntityManager:
     
-    _entities: list[Entity] = []
-    _map: dict[str, list[Entity]] = {}
+    _entities: list[Entity]
+    _map: dict[str, list[Entity]]
+
+    def __init__(self):
+        self._entities = []
+        self._map = {}
 
     def get_all(self) -> list[Entity]:
         return self._entities.copy()

@@ -20,11 +20,15 @@ def main():
     configuration = PygameConfiguration(
         start_scene = LoadScene,
         start_scene_parameters = LoadSceneParameters(
-            scene = GatheringScene,
+            scene = EncounterScene,
             load_files = {
                 AssetMap.TEST_SPRITE_SHEET: AssetLoadConfiguration(type=AssetType.Image),
                 AssetMap.TEST_TILE: AssetLoadConfiguration(type=AssetType.Image),
+
                 AssetMap.TEST_CARD: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TEST_CARD2: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TEST_CARD3: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TEST_CARD4: AssetLoadConfiguration(type=AssetType.Image),
 
                 AssetMap.MONTSERRAT_24: AssetLoadConfiguration(type=AssetType.Font, parse_parameters={FontLoadParams.FONT_SIZE: 24})
             }
@@ -40,7 +44,7 @@ def main():
         print("Game ungracefully stopped because of an exception")
         raise
     
-    engine.cleanup
+    engine.cleanup()
 
 if __name__ == "__main__":
     main()

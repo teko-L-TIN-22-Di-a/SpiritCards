@@ -8,7 +8,10 @@ class AssetType(Enum):
 
 class AssetManager:
     
-    _asset_map: dict[str, any] = {}
+    _asset_map: dict[str, any]
+
+    def __init__(self):
+        self._asset_map = {}
 
     def register_asset_map(self, asset_map: dict[str, any]) -> None:
         for entry in asset_map: self._asset_map[entry] = asset_map[entry]

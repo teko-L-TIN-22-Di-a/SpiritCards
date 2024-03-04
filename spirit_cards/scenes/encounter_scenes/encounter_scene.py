@@ -2,6 +2,7 @@ import pygame
 from spirit_cards.asset_map import AssetMap
 from spirit_cards.card_engine.card_engine import CardEngine
 from spirit_cards.card_engine.card_player import CardPlayer
+from spirit_cards.card_library.test_deck import get_test_deck
 from spirit_cards.core.context import ScopedContext
 
 from spirit_cards.core.engine_services import *
@@ -13,7 +14,8 @@ from spirit_cards.pygame_extension.gui.msg_box import MsgBox
 from spirit_cards.pygame_extension.pygame_services import *
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
 
-from spirit_cards.scenes.encounter_scenes.board_components.board import Board
+from spirit_cards.scenes.encounter_scenes.board_components.board_renderer import BoardRenderer
+from spirit_cards.scenes.encounter_scenes.board_components.debug_board_renderer import DebugBoardRenderer
 from spirit_cards.scenes.encounter_scenes.encounter_services import EncounterServices
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.services.global_services import GlobalServices
@@ -29,7 +31,7 @@ class EncounterScene(Scene):
 
     _entity_manager: EntityManager
     _card_engine: CardEngine
-    _board: Board
+    _board: BoardRenderer
 
     _font: pygame.font.Font
 
@@ -43,20 +45,20 @@ class EncounterScene(Scene):
         self._font = asset_manager.get_font(AssetMap.MONTSERRAT_24)
 
         self._entity_manager = EntityManager()
-        msgBox = MsgBox(self.context)
+        msg_box = MsgBox(self.context)
+        player1 = CardPlayer(get_test_deck())
+        player2 = CardPlayer(get_test_deck())
+        self._card_engine = CardEngine(player1, player2)
         self._scoped_context = ScopedContext(self.context, {
             EncounterServices.ENTITY_MANAGER: self._entity_manager,
-            EncounterServices.MESSAGE_BOX: msgBox
+            EncounterServices.MESSAGE_BOX: msg_box,
+            EncounterServices.CARD_ENGINE: self._card_engine
         })
 
-        player1 = CardPlayer()
-        player2 = CardPlayer()
-        
-        self._card_engine = CardEngine(player1, player2)
-
-        self._entity_manager.register(Board(self._scoped_context))
-        self._entity_manager.register(CardEngine(player1, player2), [CardEngine.TAG])
-        self._entity_manager.register(msgBox)
+        self._entity_manager.register(self._card_engine)
+        self._entity_manager.register(DebugBoardRenderer(self._scoped_context))
+        # self._entity_manager.register(BoardRenderer(self._scoped_context))
+        self._entity_manager.register(msg_box)
 
     def process(self, delta: float) -> None:
 

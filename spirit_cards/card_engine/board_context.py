@@ -1,12 +1,17 @@
-from spirit_cards.card_engine.slot import Slot
+from spirit_cards.card_engine.card_player import CardPlayer
 
 class BoardContext:
-    BATTLE_SLOT_COUNT = 4
-    SUPPORT_SLOT_COUNT = 2
-    HAND_SIZE = 5
+    round_count: int = 1
 
-    battle_slots: list[Slot]
-    support_slots: list[Slot]
-    hand_slots: list[Slot]
-    grave_slots: list[Slot]
+    # Round independent player views
+    player1: CardPlayer
+    player2: CardPlayer
+
+    # Player depending on who is playing this round
+    player: CardPlayer
+    opponent: CardPlayer
+
+    def __init__(self, player, opponent):
+        self.player = self.player1 = player
+        self.opponent = self.player2= opponent
     

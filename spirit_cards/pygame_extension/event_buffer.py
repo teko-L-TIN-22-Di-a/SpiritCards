@@ -1,7 +1,10 @@
 import pygame
 
 class EventBuffer:
-    _events: list[pygame.event.Event] = []
+    _events: list[pygame.event.Event]
+
+    def __init__(self):
+        self._events = []
 
     def update(self, events: list[pygame.event.Event]) -> None:
         self._events = events

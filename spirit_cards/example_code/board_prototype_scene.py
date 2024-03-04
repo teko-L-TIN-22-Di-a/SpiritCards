@@ -11,7 +11,7 @@ from spirit_cards.core.scene_switcher import SceneSwitcher
 from spirit_cards.pygame_extension.pygame_services import *
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
 
-from spirit_cards.scenes.encounter_scenes.board_components.board import Board
+from spirit_cards.scenes.encounter_scenes.board_components.board_renderer import BoardRenderer
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.services.global_services import GlobalServices
 from spirit_cards.pygame_extension.pygame_services import PygameServices
@@ -25,7 +25,7 @@ class BoardPrototypeScene(Scene):
     _scene_switcher: SceneSwitcher
 
     _card_engine: CardEngine
-    _board: Board
+    _board: BoardRenderer
 
     _font: pygame.font.Font
     _card_texture: pygame.surface.Surface
@@ -50,7 +50,7 @@ class BoardPrototypeScene(Scene):
         
         self._card_engine = CardEngine(player1, player2)
 
-        self._board = Board(self._scoped_context)
+        self._board = BoardRenderer(self._scoped_context)
 
     def process(self, delta: int) -> None:
 

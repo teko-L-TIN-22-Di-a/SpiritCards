@@ -1,6 +1,5 @@
 
 from dataclasses import dataclass
-from spirit_cards.card_engine.card_player import CardPlayer
 
 @dataclass
 class RequirementInstance:

@@ -2,19 +2,18 @@
 from spirit_cards.card_engine.action import Action, ActionInstance, Actions
 from spirit_cards.card_engine.board_context import BoardContext
 from spirit_cards.card_engine.requirement import Requirement
-from spirit_cards.card_engine.round_context import RoundContext
 from spirit_cards.core.state_machine.state_machine import State, StateMachine
 
 class RoundStateHandler(StateMachine):
 
-    def __init__(self, round_context: RoundContext, board_context: BoardContext):
+    def __init__(self, board_context: BoardContext):
 
         states = {
-            RoundState.REFRESH_PHASE: RefreshPhase(round_context, board_context),
-            RoundState.MAIN_PHASE: MainPhase(round_context, board_context),
-            RoundState.BATTLE_PHASE: BattlePhase(round_context, board_context),
-            RoundState.MAIN_PHASE_2: MainPhase2(round_context, board_context),
-            RoundState.END_PHASE: EndPhase(round_context, board_context),
+            RoundState.REFRESH_PHASE: RefreshPhase(board_context),
+            RoundState.MAIN_PHASE: MainPhase(board_context),
+            RoundState.BATTLE_PHASE: BattlePhase(board_context),
+            RoundState.MAIN_PHASE_2: MainPhase2(board_context),
+            RoundState.END_PHASE: EndPhase(board_context),
         }
 
         super().__init__(states, RoundState.REFRESH_PHASE)
@@ -30,15 +29,15 @@ class RoundState(State):
     next_phase = None
 
     buffered_action: Action = None
-    action_stack: list[ActionInstance] = []
-    requirements_stack: list[ActionInstance] = []
+    action_stack: list[ActionInstance]
+    requirements_stack: list[ActionInstance]
 
-    round_context: RoundContext
     board_context: BoardContext
 
-    def __init__(self, round_context: RoundContext, board_context: BoardContext):
-        self.round_context = round_context
+    def __init__(self, board_context: BoardContext):
         self.board_context = board_context
+        self.action_stack = []
+        self.requirements_stack = []
 
     def enter(self, msg: dict) -> None:
         self.action_stack = []
@@ -92,9 +91,9 @@ class RoundState(State):
                 self.transition_to(next_phase)
 
     def swap_players(self):
-        player = self.round_context.player
-        self.round_context.player = self.round_context.opponent
-        self.round_context.opponent = player
+        player = self.board_context.player
+        self.board_context.player = self.board_context.opponent
+        self.board_context.opponent = player
         
 
 class RefreshPhase(RoundState):
@@ -130,4 +129,4 @@ class EndPhase(RoundState):
 
     def exit(self) -> None:
         self.swap_players()
-        self.round_context.round_count += 1
+        self.board_context.round_count += 1

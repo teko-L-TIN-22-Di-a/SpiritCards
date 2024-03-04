@@ -1,6 +1,6 @@
 class Context:
 
-    _all_services:dict[str, any] = {}
+    _all_services: dict[str, any]
 
     def __init__(self, serviceConfiguration: dict[str, any]):
         self._all_services = serviceConfiguration
@@ -16,7 +16,7 @@ class Context:
 
 class ScopedContext(Context):
 
-    _scoped_services:dict[str, any] = {}
+    _scoped_services: dict[str, any]
 
     base_context: Context
 

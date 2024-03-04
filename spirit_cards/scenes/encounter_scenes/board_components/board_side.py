@@ -2,7 +2,8 @@
 from dataclasses import dataclass
 import pygame
 from spirit_cards.asset_map import AssetMap
-from spirit_cards.card_engine.board_context import BoardContext
+from spirit_cards.card_engine.board_constants import BoardConstants
+from spirit_cards.card_engine.card_player import CardPlayer
 from spirit_cards.card_engine.slot import Slot
 from spirit_cards.core.context import Context
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
@@ -23,28 +24,31 @@ class BoardSide(UIComponent):
     _msg_box: MsgBox
     _event_buffer: EventBuffer
 
-    _card_texture: pygame.Surface
+    _card_textures: dict[str, pygame.Surface]
+
+    player: CardPlayer
 
     battle_zone: BattleZone
     support_zone: SupportZone
     hand_zone: HandZone
 
-    battle_slots: list[Slot]
-    support_slots: list[Slot]
-    hand_slots: list[Slot]
-
-    def __init__(self, rect: pygame.Rect, context: Context):
+    def __init__(self, rect: pygame.Rect, player: CardPlayer, context: Context):
         super().__init__(rect)
 
+        self.player = player
         self._context = context
         self._msg_box = self._context.get_service(EncounterServices.MESSAGE_BOX)
         self._event_buffer = context.get_service(PygameServices.EVENT_BUFFER)
-        asset_manager: AssetManager = self._context.get_service(GlobalServices.ASSET_MANAGER)
-        self._card_texture = asset_manager.get_image(AssetMap.TEST_CARD)
 
-        self.battle_slots = [Slot() for x in range(0, BoardContext.BATTLE_SLOT_COUNT)]
-        self.support_slots = [Slot() for x in range(0, BoardContext.SUPPORT_SLOT_COUNT)]
-        self.hand_slots = []
+        asset_manager: AssetManager = self._context.get_service(GlobalServices.ASSET_MANAGER)
+
+        # TODO clean this up
+        self._card_textures = {
+            AssetMap.TEST_CARD: asset_manager.get_image(AssetMap.TEST_CARD),
+            AssetMap.TEST_CARD2: asset_manager.get_image(AssetMap.TEST_CARD2),
+            AssetMap.TEST_CARD3: asset_manager.get_image(AssetMap.TEST_CARD3),
+            AssetMap.TEST_CARD4: asset_manager.get_image(AssetMap.TEST_CARD4)
+        }
 
         self._initialize_component()
 
@@ -62,13 +66,20 @@ class BoardSide(UIComponent):
         pygame.draw.rect(board_surface, "#405F73", self.support_zone.get_inner_rect(), 2, 4)
         pygame.draw.rect(board_surface, "#405F73", self.hand_zone.get_inner_rect(), border_radius=4)
 
+        self._draw_slots(board_surface, mouse_pos, flipped)        
+
+        pygame.draw.circle(board_surface, "red", mouse_pos, 8, 2)
+
+        return pygame.transform.rotate(board_surface, 180) if flipped else board_surface
+
+    def _draw_slots(self, board_surface: pygame.Surface, mouse_pos: pygame.Vector2, flipped: bool):
+
         slots = (
             self.battle_zone.slots_components + 
             self.support_zone.slots_components
         )
 
         click = False
-
         for event in self._event_buffer.get_events():
             if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1): # 1 == Left mouse button
                 click = True
@@ -81,7 +92,9 @@ class BoardSide(UIComponent):
                     self._show_msg_box(slot, flipped)
 
             pygame.draw.rect(board_surface, "#5A798C", slot.get_inner_rect(), 2, 4)
-            board_surface.blit(pygame.transform.scale(self._card_texture, slot.get_inner_rect().size), slot.get_inner_rect())
+            if(slot.slot.card is not None):
+                texture = self._card_textures[slot.slot.card.asset_key]
+                board_surface.blit(pygame.transform.scale(texture, slot.get_inner_rect().size), slot.get_inner_rect())
 
         for slot in self.hand_zone.slots_components:
             if(slot.get_inner_rect().collidepoint(mouse_pos.x, mouse_pos.y)):
@@ -90,11 +103,9 @@ class BoardSide(UIComponent):
                 if(click):
                     self._show_msg_box(slot, flipped)
 
-            board_surface.blit(pygame.transform.scale(self._card_texture, slot.get_inner_rect().size), slot.get_inner_rect())
-
-        pygame.draw.circle(board_surface, "red", mouse_pos, 8, 2)
-
-        return pygame.transform.rotate(board_surface, 180) if flipped else board_surface
+            if(slot.slot.card is not None):
+                texture = self._card_textures[slot.slot.card.asset_key]
+                board_surface.blit(pygame.transform.scale(texture, slot.get_inner_rect().size), slot.get_inner_rect())
 
     def _show_msg_box(self, slot: SlotComponent, flipped: bool) -> None:
 
@@ -112,22 +123,21 @@ class BoardSide(UIComponent):
     def _initialize_component(self):
         margin = pygame.Vector2(6, 6)
         card_size = pygame.Vector2((185, 256))
-        board_space_between = 32
 
         #TODO add Grave add Deck
 
-        self.battle_zone = BattleZone(pygame.Rect(
+        self.battle_zone = BattleZone(self.player, pygame.Rect(
             0,0,
             pygame.Vector2(self.get_rect().size).x * 0.64,
             pygame.Vector2(self.get_rect().size).y * 0.55
         ), margin)
 
-        self.support_zone = SupportZone(pygame.Rect(
+        self.support_zone = SupportZone(self.player, pygame.Rect(
             0, self.battle_zone.get_rect().bottom,
             pygame.Vector2(self.get_rect().size).x * 0.28,
             pygame.Vector2(self.get_rect().size).y * 0.45,
         ), margin)
-        self.hand_zone = HandZone(pygame.Rect(
+        self.hand_zone = HandZone(self.player, pygame.Rect(
             self.support_zone.get_rect().right, self.battle_zone.get_rect().bottom,
             pygame.Vector2(self.get_rect().size).x * 0.72,
             pygame.Vector2(self.get_rect().size).y * 0.45
