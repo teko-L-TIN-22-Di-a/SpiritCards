@@ -7,6 +7,8 @@ from spirit_cards.card_engine.card_player import CardPlayer
 from spirit_cards.card_engine.slot import Slot
 from spirit_cards.core.context import Context
 from spirit_cards.pygame_extension.event_buffer import EventBuffer
+from spirit_cards.pygame_extension.gui.button import Button, ButtonConfig
+from spirit_cards.pygame_extension.gui.button_container import ButtonContainer
 from spirit_cards.pygame_extension.gui.msg_box import MsgBox, MsgBoxConfiguration
 from spirit_cards.pygame_extension.gui.ui_component import UIComponent
 from spirit_cards.pygame_extension.pygame_services import PygameServices
@@ -116,9 +118,18 @@ class BoardSide(UIComponent):
             position = (position - board_center).rotate(180) + board_center
 
         self._msg_box.show(MsgBoxConfiguration(
-            UIComponent(pygame.Rect(0,0,64,64)),
+            self._test_button_container(),
             position = position
         ))
+
+    def _test_button_container(self):
+        return ButtonContainer([
+            Button(self._context, ButtonConfig("test", "Summon", pygame.Vector2(224, 32), self._on_click)),
+            Button(self._context, ButtonConfig("test2", "Special", pygame.Vector2(224, 32), self._on_click))
+        ])
+    
+    def _on_click(self, tag: str):
+        print(f"Button with tag <{tag}> was pressed")
 
     def _initialize_component(self):
         margin = pygame.Vector2(6, 6)

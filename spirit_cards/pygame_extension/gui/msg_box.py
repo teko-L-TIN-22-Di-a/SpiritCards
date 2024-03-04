@@ -29,6 +29,7 @@ class MsgBox(Entity):
     def show(self, config: MsgBoxConfiguration) -> None:
         self.current_configuration = config
         self.visible = True
+        self._init_component()
 
     def close(self) -> None:
         self.visible = False
@@ -40,6 +41,8 @@ class MsgBox(Entity):
         if(not self.current_configuration.close_on_click):
             return
         
+        self.current_configuration.component.update()
+
         for event in self._event_buffer.get_events():
             if(event.type != pygame.MOUSEBUTTONDOWN):
                 continue
@@ -58,10 +61,21 @@ class MsgBox(Entity):
         
         component = self.current_configuration.component
         component_rect = component.get_rect().move(self.get_position()).move(-pygame.Vector2(component.get_rect().center))
-        pygame.draw.rect(self._surface, "red", component_rect)
+        
+        self._surface.blit(component.get_surface(), component_rect)
 
     def get_position(self) -> pygame.Vector2:
         if(self.current_configuration.position is not None):
             return self.current_configuration.position
         else:
             return pygame.Vector2(self._surface.get_rect().center)
+        
+    def _init_component(self):
+        component = self.current_configuration.component
+        offset = pygame.Vector2(component.get_rect().center)
+
+        self.current_configuration.component.relative_to = UIComponent(pygame.Rect(
+            self.current_configuration.position.x - offset.x,
+            self.current_configuration.position.y - offset.y,
+            0,0
+        ))

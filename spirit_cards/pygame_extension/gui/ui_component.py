@@ -30,8 +30,14 @@ class UIComponent:
         
         return pos
     
+    def get_local_pos(self) -> pygame.Rect:
+        return pygame.Vector2(self.rect.topleft)
+    
     def get_inner_pos(self) -> pygame.Vector2:
         return self.get_pos() + self.margin
+
+    def get_local_rect(self) -> pygame.Rect:
+        return self.rect.copy()
 
     def get_rect(self) -> pygame.Rect:
         if(self.relative_to is not None):
