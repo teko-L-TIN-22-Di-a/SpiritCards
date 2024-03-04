@@ -20,7 +20,7 @@ def main():
     configuration = PygameConfiguration(
         start_scene = LoadScene,
         start_scene_parameters = LoadSceneParameters(
-            scene = EncounterScene,
+            scene = GatheringScene,
             load_files = {
                 AssetMap.TEST_SPRITE_SHEET: AssetLoadConfiguration(type=AssetType.Image),
                 AssetMap.TEST_TILE: AssetLoadConfiguration(type=AssetType.Image),
