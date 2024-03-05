@@ -20,7 +20,7 @@ class Requirement:
     COST = "cost"
 
     key: str
-    parameters: any
+    parameters: any = None
 
     def new_instance(self, value: any) -> RequirementInstance:
         return RequirementInstance(self.key, value, self.parameters)

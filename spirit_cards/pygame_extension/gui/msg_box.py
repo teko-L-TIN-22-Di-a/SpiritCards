@@ -75,7 +75,7 @@ class MsgBox(Entity):
         offset = pygame.Vector2(component.get_rect().center)
 
         self.current_configuration.component.relative_to = UIComponent(pygame.Rect(
-            self.current_configuration.position.x - offset.x,
-            self.current_configuration.position.y - offset.y,
+            self.get_position().x - offset.x,
+            self.get_position().y - offset.y,
             0,0
         ))

@@ -21,6 +21,7 @@ class Action:
     NO_ACT = "no_action"
     SUMMON = "summon"
     ATTACK = "attack"
+    CRACK = "crack"
 
     ON_REFRESH = "on_refresh"
     ON_END = "on_end"

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import pygame
 from spirit_cards.asset_map import AssetMap
 from spirit_cards.card_engine.board_constants import BoardConstants
+from spirit_cards.card_engine.card_engine import CardEngine
 from spirit_cards.card_engine.card_player import CardPlayer
 from spirit_cards.card_engine.slot import Slot
 from spirit_cards.core.context import Context
@@ -13,6 +14,7 @@ from spirit_cards.pygame_extension.gui.msg_box import MsgBox, MsgBoxConfiguratio
 from spirit_cards.pygame_extension.gui.ui_component import UIComponent
 from spirit_cards.pygame_extension.pygame_services import PygameServices
 from spirit_cards.scenes.encounter_scenes.board_components.battle_zone import BattleZone
+from spirit_cards.scenes.encounter_scenes.board_components.card_viewer import CardViewer
 from spirit_cards.scenes.encounter_scenes.board_components.hand_zone import HandZone
 from spirit_cards.scenes.encounter_scenes.board_components.slot_component import SlotComponent
 from spirit_cards.scenes.encounter_scenes.board_components.support_zone import SupportZone
@@ -23,6 +25,7 @@ from spirit_cards.services.global_services import GlobalServices
 class BoardSide(UIComponent):
 
     _context: Context
+    _card_engine: CardEngine
     _msg_box: MsgBox
     _event_buffer: EventBuffer
 
@@ -39,6 +42,7 @@ class BoardSide(UIComponent):
 
         self.player = player
         self._context = context
+        self._card_engine = context.get_service(EncounterServices.CARD_ENGINE)
         self._msg_box = self._context.get_service(EncounterServices.MESSAGE_BOX)
         self._event_buffer = context.get_service(PygameServices.EVENT_BUFFER)
 
@@ -91,7 +95,9 @@ class BoardSide(UIComponent):
                 pygame.draw.rect(board_surface, "Green", slot.get_inner_rect(), border_radius=4)
 
                 if(click):
-                    self._show_msg_box(slot, flipped)
+                    self._show_actions(slot, flipped)
+                else:
+                    self._show_card(slot, flipped)
 
             pygame.draw.rect(board_surface, "#5A798C", slot.get_inner_rect(), 2, 4)
             if(slot.slot.card is not None):
@@ -103,13 +109,15 @@ class BoardSide(UIComponent):
                 pygame.draw.rect(board_surface, "Green", slot.get_inner_rect(), border_radius=4)
 
                 if(click):
-                    self._show_msg_box(slot, flipped)
+                    self._show_actions(slot, flipped)
+                else:
+                    self._show_card(slot, flipped)
 
             if(slot.slot.card is not None):
                 texture = self._card_textures[slot.slot.card.asset_key]
                 board_surface.blit(pygame.transform.scale(texture, slot.get_inner_rect().size), slot.get_inner_rect())
 
-    def _show_msg_box(self, slot: SlotComponent, flipped: bool) -> None:
+    def _show_actions(self, slot: SlotComponent, flipped: bool) -> None:
 
         position = pygame.Vector2(slot.get_rect().center) + pygame.Vector2(self.get_rect().topleft)
 
@@ -117,16 +125,27 @@ class BoardSide(UIComponent):
             board_center = self.get_rect().center
             position = (position - board_center).rotate(180) + board_center
 
+        buttons: list[Button] = []
+        for action in self._card_engine.round_state.get_legal_actions(slot.slot):
+            buttons.append(Button(self._context, ButtonConfig(action.key, action.key, pygame.Vector2(224, 32), self._on_click)))
+
+        if(len(buttons) <= 0):
+            return
+
         self._msg_box.show(MsgBoxConfiguration(
-            self._test_button_container(),
+            ButtonContainer(buttons),
             position = position
         ))
 
-    def _test_button_container(self):
-        return ButtonContainer([
-            Button(self._context, ButtonConfig("test", "Summon", pygame.Vector2(224, 32), self._on_click)),
-            Button(self._context, ButtonConfig("test2", "Special", pygame.Vector2(224, 32), self._on_click))
-        ])
+    def _show_card(self, slot: SlotComponent, flipped: bool) -> None:
+        if(slot.slot.card is None or not pygame.key.get_pressed()[pygame.K_LALT]):
+            return
+
+        texture = self._card_textures[slot.slot.card.asset_key]
+
+        self._msg_box.show(MsgBoxConfiguration(
+            CardViewer(texture)
+        ))
     
     def _on_click(self, tag: str):
         print(f"Button with tag <{tag}> was pressed")
