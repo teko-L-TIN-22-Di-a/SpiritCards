@@ -7,6 +7,7 @@ from dataclasses import dataclass
 @dataclass
 class Tile:
     position: pygame.Vector3
+    accessible: bool = True
 
 class IsometricTileMap:
 
@@ -22,7 +23,12 @@ class IsometricTileMap:
         self.map_size = pygame.Vector3(map_size_tuple[0], 1, map_size_tuple[1])
         self.tile_size = pygame.Vector3(tile_size_tuple)
 
-        self.tile_map = [[Tile(pygame.Vector3(x, 1, z)) for z in range(0,int(self.map_size.z))] for x in range(0,int(self.map_size.x))]
+        self.tile_map = [
+            [
+                Tile(pygame.Vector3(x, 1, z)) for z in range(0,int(self.map_size.z))
+            ]
+            for x in range(0,int(self.map_size.x))
+        ]
 
     def get_map_texture(self) -> pygame.surface.Surface:
         if (self._surface is None or self._surface_dirty):
@@ -42,6 +48,7 @@ class IsometricTileMap:
 
         # self._surface = pygame.surface.Surface((map_surface_size.x, map_surface_size.y), pygame.SRCALPHA)
         self._surface = pygame.surface.Surface((map_surface_size.x, map_surface_size.y))
+        self._surface.fill("green")
 
     def to_screen_space(self, position: pygame.Vector3) -> pygame.Vector2:
 

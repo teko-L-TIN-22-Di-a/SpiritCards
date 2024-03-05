@@ -26,6 +26,19 @@ def main():
                 AssetMap.TEST_TILE: AssetLoadConfiguration(type=AssetType.Image),
                 AssetMap.TEST_CARD: AssetLoadConfiguration(type=AssetType.Image),
                 AssetMap.TEST_SPRITE_PLAYER: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE1: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE2: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE3: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE4: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE5: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE6: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE7: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE8: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE9: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE10: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE11: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE12: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TILE13: AssetLoadConfiguration(type=AssetType.Image),
 
                 AssetMap.MONTSERRAT_24: AssetLoadConfiguration(type=AssetType.Font, parse_parameters={FontLoadParams.FONT_SIZE: 24})
             }

@@ -11,6 +11,7 @@ from spirit_cards.scenes.gathering_scenes.isometric_entity import IsometricEntit
 from spirit_cards.scenes.gathering_scenes.isometric_tile_map import IsometricTileMap
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.services.global_services import GlobalServices
+from spirit_cards.scenes.gathering_scenes.map_description import desc
 
 
 class TileMapRenderer(Entity):
@@ -26,12 +27,26 @@ class TileMapRenderer(Entity):
         self._entity_manager = context.get_service(GatheringServices.ENTITY_MANAGER)
         asset_manager: AssetManager = context.get_service(GlobalServices.ASSET_MANAGER)
         
-        self._tile_texture = asset_manager.get_image(AssetMap.TEST_TILE)
+        self._tile_texture = asset_manager.get_image(AssetMap.TILE1)
         tile_size = pygame.Vector2(self._tile_texture.get_size())
-        self._tile_map = IsometricTileMap((5,2), (tile_size.x, 190, tile_size.y))
+        # TODO dynamic tilemap
+        self.tile_array = [[]]
+        for x, row in enumerate(desc):
+            for y, tile in enumerate(row):
+                tile_name = "TILE"+str(tile)
+                asset = AssetMap.__getattribute__(AssetMap, tile_name)
+                texture = asset_manager.get_image(asset)
+                if len(self.tile_array) < x + 1:
+                    self.tile_array.append([])
+                if len(self.tile_array[x]) < y + 1:
+                    self.tile_array[x].append(0)
+                self.tile_array[x][y] = texture
+        map_height = len(desc)
+        map_width = len(desc[0])
+        self._tile_map = IsometricTileMap((map_height,map_width), (tile_size.x, 100, tile_size.y))
 
         print("Prerendering Map")
-        self._pre_draw_map()
+        self._pre_draw_map(self.tile_array)
         print("Finished Prerendering")
 
     def update(self, delta: float) -> None:
@@ -53,7 +68,7 @@ class TileMapRenderer(Entity):
     def cleanup(self) -> None:
         pass
 
-    def _pre_draw_map(self) -> None:
+    def _pre_draw_map(self, tile_array: list[list[int]]) -> None:
         surface = self._tile_map.get_map_texture()
 
         tile_offset = self._tile_map.tile_size.xy / -2 # From center coordinate of tile to top left of tile for rendering.
