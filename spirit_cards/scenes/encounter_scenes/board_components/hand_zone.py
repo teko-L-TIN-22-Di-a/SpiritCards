@@ -19,9 +19,10 @@ class HandZone(UIComponent):
         self._initialize_component()
 
     def update(self):
+        self.slots_components = []
         margin = pygame.Vector2(24, 4)
         inner_rect = self.get_inner_rect()
-        slot_size = pygame.Vector2(inner_rect.width / BoardConstants.HAND_SIZE, inner_rect.height)
+        slot_size = pygame.Vector2(inner_rect.width / min(BoardConstants.HAND_SIZE, len(self.player.hand)), inner_rect.height)
 
         for i, slot in enumerate(self.player.hand):
             self.slots_components.append(SlotComponent(

@@ -58,6 +58,9 @@ class BoardSide(UIComponent):
 
         self._initialize_component()
 
+    def update(self) -> pygame.Surface:
+        self.hand_zone.update()
+
     def draw_to_surface(self, mouse_pos: pygame.Vector2, flipped: bool = False) -> pygame.Surface:
 
         if(flipped):
@@ -80,9 +83,12 @@ class BoardSide(UIComponent):
 
     def _draw_slots(self, board_surface: pygame.Surface, mouse_pos: pygame.Vector2, flipped: bool):
 
+        card_size = pygame.Vector2((185/2, 256/2))
+
         slots = (
             self.battle_zone.slots_components + 
-            self.support_zone.slots_components
+            self.support_zone.slots_components +
+            self.hand_zone.slots_components
         )
 
         click = False
@@ -100,19 +106,6 @@ class BoardSide(UIComponent):
                     self._show_card(slot, flipped)
 
             pygame.draw.rect(board_surface, "#5A798C", slot.get_inner_rect(), 2, 4)
-            if(slot.slot.card is not None):
-                texture = self._card_textures[slot.slot.card.asset_key]
-                board_surface.blit(pygame.transform.scale(texture, slot.get_inner_rect().size), slot.get_inner_rect())
-
-        for slot in self.hand_zone.slots_components:
-            if(slot.get_inner_rect().collidepoint(mouse_pos.x, mouse_pos.y)):
-                pygame.draw.rect(board_surface, "Green", slot.get_inner_rect(), border_radius=4)
-
-                if(click):
-                    self._show_actions(slot, flipped)
-                else:
-                    self._show_card(slot, flipped)
-
             if(slot.slot.card is not None):
                 texture = self._card_textures[slot.slot.card.asset_key]
                 board_surface.blit(pygame.transform.scale(texture, slot.get_inner_rect().size), slot.get_inner_rect())
@@ -149,10 +142,10 @@ class BoardSide(UIComponent):
     
     def _on_click(self, tag: str):
         print(f"Button with tag <{tag}> was pressed")
+        self._msg_box.close()
 
     def _initialize_component(self):
         margin = pygame.Vector2(6, 6)
-        card_size = pygame.Vector2((185, 256))
 
         #TODO add Grave add Deck
 

@@ -23,6 +23,10 @@ class RoundStateHandler(StateMachine):
     def get_legal_actions(self, slot: Slot) -> list[Action]:
         current_state: RoundState = self.current_state
         return current_state.get_legal_actions(slot)
+    
+    def get_actions(self) -> list[Action]:
+        current_state: RoundState = self.current_state
+        return current_state.get_actions()
 
 class RoundState(State):
     
@@ -65,6 +69,11 @@ class RoundState(State):
                 actions.append(action)
 
         return actions
+    
+    def get_actions(self) -> list[Action]:
+        return [
+            Action(Action.NO_ACT)
+        ]
 
     def process_effects(self):
         # Go through filtered list of cards on board and execute effects.
