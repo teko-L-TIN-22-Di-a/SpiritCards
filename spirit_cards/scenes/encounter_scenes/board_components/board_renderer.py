@@ -1,6 +1,8 @@
 import pygame
 from dataclasses import dataclass
 from spirit_cards.asset_map import AssetMap
+from spirit_cards.card_engine.action import Action
+from spirit_cards.card_engine.action_instance import ActionInstance
 from spirit_cards.card_engine.card_engine import CardEngine
 from spirit_cards.card_engine.card_player import CardPlayer
 from spirit_cards.card_engine.round_state import RoundState
@@ -59,15 +61,17 @@ class BoardRenderer(Entity):
         self._render_round_actions()
 
     def _render_round_actions(self):
-        # TODO cleanup
         buttons = []
-        for action in self._card_engine.round_state.get_actions():
+        for action in self._card_engine.round_state.get_actions(self.following_player):
             buttons.append(Button(self._context, ButtonConfig(
+                action,
                 action.key,
-                action.key,
-                pygame.Vector2(128, 32),
+                pygame.Vector2(156, 32),
                 self._on_click
             )))
+
+        if(len(buttons) <= 0):
+            return
 
         action_container = ButtonContainer(buttons)
         container_size = pygame.Vector2(action_container.get_rect().size)
@@ -82,8 +86,9 @@ class BoardRenderer(Entity):
         
         self._surface.blit(action_container.get_surface(), action_container.get_pos())
 
-    def _on_click(self, tag: str):
-        print(f"Button with tag <{tag}> was pressed")
+    def _on_click(self, action: Action):
+        print(f"Button with tag <{action}> was pressed")
+        self._card_engine.round_state.buffer_action(ActionInstance(action, self.following_player, None))
 
     def _render_round_info(self):
         center = pygame.Vector2(self.middle_component.get_rect().center)

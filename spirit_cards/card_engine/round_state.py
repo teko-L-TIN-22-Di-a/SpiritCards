@@ -1,7 +1,8 @@
 
-from spirit_cards.card_engine.action import Action, ActionInstance, Actions
+from spirit_cards.card_engine.action import Action, Actions
+from spirit_cards.card_engine.action_instance import ActionInstance
 from spirit_cards.card_engine.board_context import BoardContext
-from spirit_cards.card_engine.card_player import PlayerState
+from spirit_cards.card_engine.card_player import CardPlayer, PlayerState
 from spirit_cards.card_engine.requirement import Requirement
 from spirit_cards.card_engine.slot import Slot
 from spirit_cards.core.state_machine.state_machine import State, StateMachine
@@ -20,13 +21,20 @@ class RoundStateHandler(StateMachine):
 
         super().__init__(states, RoundState.REFRESH_PHASE)
 
+    def buffer_action(self, action: ActionInstance) -> None:
+        current_state: RoundState = self.current_state
+        return current_state.buffer_action(action)
+
     def get_legal_actions(self, slot: Slot) -> list[Action]:
         current_state: RoundState = self.current_state
         return current_state.get_legal_actions(slot)
     
-    def get_actions(self) -> list[Action]:
+    def get_actions(self, player: CardPlayer) -> list[Action]:
+        if(player.state == PlayerState.IDLE):
+            return []
+
         current_state: RoundState = self.current_state
-        return current_state.get_actions()
+        return current_state.get_actions(player)
 
 class RoundState(State):
     
@@ -39,23 +47,25 @@ class RoundState(State):
     current_phase: str
     next_phase: str
 
-    buffered_action: Action = None
+    buffered_action: ActionInstance = None
     action_stack: list[ActionInstance]
-    requirements_stack: list[Requirement]
 
     board_context: BoardContext
 
     def __init__(self, board_context: BoardContext, current_phase: str, next_phase_key):
         self.board_context = board_context
         self.action_stack = []
-        self.requirements_stack = []
         self.current_phase = current_phase
         self.next_phase = next_phase_key
 
     def enter(self, msg: dict) -> None:
         self.action_stack = []
 
-    def buffer_action(self, action: Action):
+    def buffer_action(self, action: ActionInstance):
+
+        if(action.action.key == Action.CANCEL_ACTION):
+            self.buffered_action = None
+
         self.buffered_action = action
 
     def get_legal_actions(self, slot: Slot) -> list[Action]:
@@ -70,10 +80,16 @@ class RoundState(State):
 
         return actions
     
-    def get_actions(self) -> list[Action]:
-        return [
-            Action(Action.NO_ACT)
-        ]
+    def get_actions(self, player: CardPlayer) -> list[Action]:    
+        actions = []
+
+        if(len(self.action_stack) <= 0 and self.buffered_action is None):
+            actions.append(Action(Action.NEXT_PHASE))
+        
+        if(len(self.action_stack) > 0 and self.buffered_action is None):
+            actions.append(Action(Action.NO_ACT))
+
+        return actions
 
     def process_effects(self):
         # Go through filtered list of cards on board and execute effects.
@@ -88,7 +104,7 @@ class RoundState(State):
         if(self.buffered_action is None):
             return
         
-        if(len(self.requirements_stack) == len(self.buffered_action.requirements)):
+        if(self.buffered_action.is_complete()):
             self.resolve_requirement_stack()
             self.action_stack.append(self.buffered_action)
             self.buffered_action = None
@@ -109,14 +125,14 @@ class RoundState(State):
             return
         
         top_element = self.action_stack[-1]
-        if(top_element.key == Action.NO_ACT):
-            self.resolve_action_stack(self.next_phase)
+        if(top_element.action.key == Action.NO_ACT):
+            self.resolve_action_stack()
 
-        if(top_element.source == ActionInstance.OPPONENT_SOURCE or
-           top_element.source == ActionInstance.SYSTEM_SOURCE):
+        if(top_element.source == self.board_context.opponent or
+           top_element.source is None):
             self.board_context.player.state = PlayerState.WAIT_FOR_INPUT
             self.board_context.opponent.state = PlayerState.IDLE
-        elif(top_element.source == ActionInstance.PLAYER_SOURCE):
+        elif(top_element.source == self.board_context.player):
             self.board_context.player.state = PlayerState.IDLE
             self.board_context.opponent.state = PlayerState.WAIT_FOR_INPUT
 
@@ -126,14 +142,13 @@ class RoundState(State):
         pass
 
     def resolve_action_stack(self):
-        current_action = self.action_stack.pop()
-        
-        while(current_action is not None):
 
-            if(current_action.key == Action.NEXT_PHASE):
-                self.transition_to(self.next_phase)
-
+        while(len(self.action_stack) > 0):
+            
             current_action = self.action_stack.pop()
+
+            if(current_action.action.key == Action.NEXT_PHASE):
+                self.transition_to(self.next_phase)
 
     def swap_players(self):
         player = self.board_context.player
@@ -151,7 +166,8 @@ class RefreshPhase(RoundState):
         if(self.board_context.round_count != 1):
             self.board_context.player.draw_card()
 
-        self.action_stack.append(Actions[Action.ON_REFRESH].new_instance(ActionInstance.SYSTEM_SOURCE))
+        self.action_stack.append(ActionInstance(Actions[Action.NEXT_PHASE], None, None))
+        self.action_stack.append(ActionInstance(Actions[Action.ON_REFRESH], None, None))
 
     def update(self) -> None:
         self.process_actions()
@@ -186,7 +202,8 @@ class EndPhase(RoundState):
         super().__init__(board_context, RoundState.END_PHASE, RoundState.REFRESH_PHASE)
 
     def enter(self, msg: dict) -> None:
-        self.action_stack.append(Actions[Action.ON_END].new_instance(ActionInstance.SYSTEM_SOURCE))
+        self.action_stack.append(ActionInstance(Actions[Action.NEXT_PHASE], None, None))
+        self.action_stack.append(ActionInstance(Actions[Action.ON_END], None, None))
 
     def update(self) -> None:
         self.process_actions()

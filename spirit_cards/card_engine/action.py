@@ -1,22 +1,11 @@
 
 from dataclasses import dataclass
-from spirit_cards.card_engine.requirement import Requirement, RequirementInstance
-
-@dataclass
-class ActionInstance:
-
-    PLAYER_SOURCE = "player"
-    OPPONENT_SOURCE = "opponent"
-    SYSTEM_SOURCE = "system"
-
-    key: str
-    source: str
-    parameters: dict[str, any] = None
-    requirements: list[RequirementInstance] = None
+from spirit_cards.card_engine.requirement import Requirement
 
 @dataclass
 class Action:
 
+    CANCEL_ACTION = "cancel_action"
     NEXT_PHASE = "next_phase"
     NO_ACT = "no_action"
     SUMMON = "summon"
@@ -30,12 +19,9 @@ class Action:
     availability: list[str] = None
     requirements: list[Requirement] = None
     parameters: dict[str, any] = None
-
-    def new_instance(self, source: str) -> ActionInstance:
-
-        return ActionInstance(self.key, source, self.parameters, [x.new_instance(None) for x in self.requirements or []])
     
 Actions = {
+    Action.NEXT_PHASE: Action(Action.NEXT_PHASE),
     Action.ON_REFRESH: Action(Action.ON_REFRESH),
     Action.ON_END: Action(Action.ON_END)
 }

@@ -12,10 +12,10 @@ from spirit_cards.services.global_services import GlobalServices
 
 @dataclass
 class ButtonConfig:
-    tag: str
+    param: any
     text: str
     size: pygame.Vector2
-    on_click: Callable[[str], None]
+    on_click: Callable[[any], None]
 
 class Button(UIComponent):
 
@@ -58,7 +58,7 @@ class Button(UIComponent):
 
             for event in self._event_buffer.get_events():
                 if(event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
-                    self.button_config.on_click(self.button_config.tag)
+                    self.button_config.on_click(self.button_config.param)
 
         
 

@@ -26,6 +26,7 @@ class StateMachine:
 
     def __init__(self, states: dict[str, State], inital_state: str):
         self._states = states
+        self._state_stack = []
 
         for state in states:
             states[state].transition_back = self.transition_back
@@ -48,7 +49,7 @@ class StateMachine:
             self._state_stack.append(self.current_state)
 
             if(len(self._state_stack) > StateMachine.MAX_STACK_SIZE):
-                self.current_state = self.current_state[1:]
+                self._state_stack = self._state_stack[1:]
         
         self.current_state = self._states[state_key]
         self.current_state.enter(msg)
