@@ -10,7 +10,6 @@ from spirit_cards.scenes.gathering_scenes.follow_camera import FollowCamera
 from spirit_cards.scenes.gathering_scenes.gathering_player import GatheringPlayer
 from spirit_cards.scenes.gathering_scenes.gathering_services import GatheringServices
 from spirit_cards.scenes.gathering_scenes.isometric_entity import IsometricEntity
-from spirit_cards.scenes.gathering_scenes.isometric_tile_map import IsometricTileMap
 from spirit_cards.scenes.gathering_scenes.tile_map_renderer import TileMapRenderer
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.services.global_services import GlobalServices

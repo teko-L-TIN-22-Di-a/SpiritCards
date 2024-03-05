@@ -30,23 +30,11 @@ class TileMapRenderer(Entity):
         self._tile_texture = asset_manager.get_image(AssetMap.TILE1)
         tile_size = pygame.Vector2(self._tile_texture.get_size())
         # TODO dynamic tilemap
-        self.tile_array = [[]]
-        for x, row in enumerate(desc):
-            for y, tile in enumerate(row):
-                tile_name = "TILE"+str(tile)
-                asset = AssetMap.__getattribute__(AssetMap, tile_name)
-                texture = asset_manager.get_image(asset)
-                if len(self.tile_array) < x + 1:
-                    self.tile_array.append([])
-                if len(self.tile_array[x]) < y + 1:
-                    self.tile_array[x].append(0)
-                self.tile_array[x][y] = texture
-        map_height = len(desc)
-        map_width = len(desc[0])
-        self._tile_map = IsometricTileMap((map_height,map_width), (tile_size.x, 100, tile_size.y))
+        
+        self._tile_map = IsometricTileMap(context, desc, (tile_size.x, 100, tile_size.y))
 
         print("Prerendering Map")
-        self._pre_draw_map(self.tile_array)
+        self._pre_draw_map()
         print("Finished Prerendering")
 
     def update(self, delta: float) -> None:
@@ -68,7 +56,7 @@ class TileMapRenderer(Entity):
     def cleanup(self) -> None:
         pass
 
-    def _pre_draw_map(self, tile_array: list[list[int]]) -> None:
+    def _pre_draw_map(self) -> None:
         surface = self._tile_map.get_map_texture()
 
         tile_offset = self._tile_map.tile_size.xy / -2 # From center coordinate of tile to top left of tile for rendering.
@@ -76,4 +64,4 @@ class TileMapRenderer(Entity):
         for x, row in enumerate(self._tile_map.tile_map):
             for z, item in enumerate(row):
                 screen_pos = self._tile_map.to_screen_space(pygame.Vector3(x, item.position.y, z))
-                surface.blit(self._tile_texture, screen_pos + tile_offset)
+                surface.blit(self._tile_map.tile_array[x-1][z-1], screen_pos + tile_offset)
