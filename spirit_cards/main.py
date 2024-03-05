@@ -25,6 +25,7 @@ def main():
                 AssetMap.TEST_SPRITE_SHEET: AssetLoadConfiguration(type=AssetType.Image),
                 AssetMap.TEST_TILE: AssetLoadConfiguration(type=AssetType.Image),
                 AssetMap.TEST_CARD: AssetLoadConfiguration(type=AssetType.Image),
+                AssetMap.TEST_SPRITE_PLAYER: AssetLoadConfiguration(type=AssetType.Image),
 
                 AssetMap.MONTSERRAT_24: AssetLoadConfiguration(type=AssetType.Font, parse_parameters={FontLoadParams.FONT_SIZE: 24})
             }

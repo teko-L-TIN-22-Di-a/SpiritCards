@@ -6,6 +6,7 @@ class AssetMap:
     # TEST_TILE = "assets/test_tile3.png"
     TEST_TILE = "assets/tiles/tiles-3.png"
     TEST_CARD = "assets/test_card.png"
+    TEST_SPRITE_PLAYER = "assets/test_playersprite2.png"
 
     # Fonts
     MONTSERRAT_24 = "assets/fonts/Montserrat-Regular.ttf"

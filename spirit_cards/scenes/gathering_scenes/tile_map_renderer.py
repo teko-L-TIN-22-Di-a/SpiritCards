@@ -48,11 +48,7 @@ class TileMapRenderer(Entity):
 
         for entity in isometric_entities:
             draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset
-            # TODO tidy up asset
-            playersprite = pygame.image.load("assets/test_playersprite2.png")
-            playersprite = pygame.transform.scale(playersprite,(82,96))
-            self._surface.blit(playersprite, draw_pos)
-            # pygame.draw.circle(self._surface, "Cyan", draw_pos, 24, 8)
+            self._surface.blit(entity.surface, draw_pos)
 
     def cleanup(self) -> None:
         pass
