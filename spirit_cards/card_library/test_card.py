@@ -22,6 +22,7 @@ class Actions:
             Actions.get_summon(),
             Actions.get_attack(),
             Actions.get_crack(),
+            Actions.get_block()
         ]
 
     def get_summon():
@@ -32,12 +33,23 @@ class Actions:
             requirements = [Requirement(Requirement.MANA_COST), Requirement(Requirement.TARGET_FREE_SLOT)]
         )
 
+    def get_block():
+        return Action(
+            Action.BLOCK,
+            phase_availability = [RoundState.BATTLE_PHASE],
+            placement_requirements = [Slot.BATTLE_SLOT],
+            requirements = [Requirement(Requirement.TARGET_ATTACKING)],
+            only_as_reaction = True,
+            only_playing = False
+        )
+
     def get_attack():
         return Action(
             Action.ATTACK, 
             phase_availability = [RoundState.BATTLE_PHASE],
             placement_requirements = [Slot.BATTLE_SLOT],
-            requirements = [Requirement(Requirement.BATTLE_TARGET)]
+            requirements = []
+            #requirements = [Requirement(Requirement.BATTLE_TARGET)] # TODO plan was to have target for attacking but stuff is hard.
         )
     
     def get_crack():

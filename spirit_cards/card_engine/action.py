@@ -10,6 +10,7 @@ class Action:
     NO_ACT = "no_action"
     SUMMON = "summon"
     ATTACK = "attack"
+    BLOCK = "block"
     CRACK = "crack"
 
     ON_REFRESH = "on_refresh"
@@ -19,6 +20,7 @@ class Action:
     phase_availability: list[str] = None
     placement_requirements: list[str] = None
     only_playing: bool = True
+    only_as_reaction: bool = False
 
     requirements: list[Requirement] = None
     parameters: dict[str, any] = None

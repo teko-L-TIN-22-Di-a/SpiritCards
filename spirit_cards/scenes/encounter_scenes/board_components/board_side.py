@@ -127,6 +127,10 @@ class BoardSide(UIComponent):
             pygame.draw.rect(board_surface, "#5A798C", slot.get_inner_rect(), 2, 4)
             if(slot.slot.card is not None):
                 texture = self._card_textures[slot.slot.card.asset_key]
+                
+                if(slot.slot.exhausted):
+                    pygame.draw.rect(board_surface, "darkgray", slot.get_inner_rect(), border_radius=4)
+
                 board_surface.blit(pygame.transform.scale(texture, slot.get_inner_rect().size), slot.get_inner_rect())
 
             if(slot.slot.active):
@@ -152,6 +156,9 @@ class BoardSide(UIComponent):
 
 
     def _show_actions(self, slot: SlotComponent, flipped: bool) -> None:
+
+        if(self.player != self.following_player): # TODO this is kinda dirty improve!
+            return
 
         position = pygame.Vector2(slot.get_rect().center) + pygame.Vector2(self.get_rect().topleft)
 

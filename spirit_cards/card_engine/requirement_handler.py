@@ -17,7 +17,8 @@ class RequirementHandler:
         self.context = context
         self.resolve_map = {
             Requirement.MANA_COST: self.handle_mana_cost,
-            Requirement.TARGET_FREE_SLOT: self.handle_target_free_slot
+            Requirement.TARGET_FREE_SLOT: self.handle_target_free_slot,
+            Requirement.TARGET_ATTACKING: self.handle_target_attacking
         }
 
     def handle_mana_cost(self, requirement: RequirementInstance, instance: ActionInstance):
@@ -25,6 +26,20 @@ class RequirementHandler:
         if(instance.source.resources < cost):
             return
         requirement.value = cost
+
+    def handle_target_attacking(self, requirement: RequirementInstance, instance: ActionInstance):
+        player = self.context.player
+
+        slots_to_check = [
+            *player.battle_slots,
+            *player.support_slots
+        ]
+
+        for slot in slots_to_check:
+            if(not slot.attacking or slot.blocked): 
+                continue
+
+            slot.active = True
 
     def handle_target_free_slot(self, requirement: RequirementInstance, instance: ActionInstance):
         player = instance.source

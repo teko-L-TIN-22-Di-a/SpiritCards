@@ -1,3 +1,4 @@
+import pygame
 from spirit_cards.asset_map import AssetMap
 from spirit_cards.constants import FRAME_RATE
 from spirit_cards.example_code.board_prototype_scene import BoardPrototypeScene

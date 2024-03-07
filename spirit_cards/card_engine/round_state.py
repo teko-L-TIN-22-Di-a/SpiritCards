@@ -88,6 +88,10 @@ class RoundState(State):
             self.action_handler.resolve_action(action)
             return
 
+        if(action.action.key == Action.ATTACK):
+            action.slot.attacking = True # Prematurely set attacking to Ture. A better way maybe TODO
+            action.slot.exhausted = True
+
         if(action.action.key == Action.CANCEL_ACTION):
             self.buffered_action = None
             return
@@ -104,8 +108,20 @@ class RoundState(State):
         
         actions: list[Action] = []
 
+        if(slot.exhausted):
+            return actions
+
         for action in slot.card.actions:
+
+            if(len(self.action_stack) > 0 and action.key == Action.ATTACK): # Don't allow attacking inside an action chain.
+                continue
+
+            if(slot.just_summoned and not action.key == Action.BLOCK): # Allow blocking with just summoned spirits
+                continue
+
             if(action.only_playing and player != self.board_context.player):
+                continue
+            if(action.only_as_reaction and player != self.board_context.opponent):
                 continue
 
             if(self.current_phase in action.phase_availability
@@ -137,6 +153,22 @@ class RoundState(State):
         self.process_requirement()
         self.process_reaction()
         self.process_action()
+
+        self.process_player_slots(self.board_context.player)
+        self.process_player_slots(self.board_context.opponent)
+
+    def process_player_slots(self, player: CardPlayer):
+        slots_to_check = [
+            *player.battle_slots,
+            *player.support_slots
+        ]
+
+        for slot in slots_to_check:
+            if(slot.alive): continue
+
+            tmp_card = slot.card
+            slot.card = None
+            player.grave_slots.append(Slot(Slot.GRAVE_SLOT, tmp_card))
 
     def deactivate_all(self):
         slots = [
@@ -243,6 +275,9 @@ class RefreshPhase(RoundState):
 
     def enter(self, msg: dict) -> None:
         super().enter(msg)
+
+        self.refresh_slots(self.board_context.player)
+
         if(self.board_context.round_count != 1):
             self.board_context.player.draw_card()
 
@@ -251,6 +286,16 @@ class RefreshPhase(RoundState):
 
     def update(self) -> None:
         self.process_actions()
+
+    def refresh_slots(self, player: CardPlayer):
+        slots = [
+            *player.battle_slots,
+            *player.support_slots
+        ]
+
+        for slot in slots:
+            slot.exhausted = False
+            slot.just_summoned = False
 
 class MainPhase(RoundState):
 
@@ -267,6 +312,16 @@ class BattlePhase(RoundState):
 
     def update(self) -> None:
         self.process_actions()
+
+    def exit(self) -> None:
+        self.reset_combat_states(self.board_context.player)
+        self.reset_combat_states(self.board_context.opponent)
+
+    def reset_combat_states(self, player: CardPlayer):
+        slots = [
+            *player.battle_slots,
+            *player.support_slots
+        ]
 
 class MainPhase2(RoundState):
     

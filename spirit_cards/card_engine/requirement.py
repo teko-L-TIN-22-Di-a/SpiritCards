@@ -4,6 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class Requirement:
 
+    TARGET_ATTACKING = "target_attacking"
     BATTLE_TARGET = "battle_target"
     TARGET_CARD = "target_card"
     TARGET_FREE_SLOT = "target_free_slot"
