@@ -16,9 +16,13 @@ class Action:
     ON_END = "on_end"
 
     key: str
-    availability: list[str] = None
+    phase_availability: list[str] = None
+    placement_requirements: list[str] = None
+    only_playing: bool = True
+
     requirements: list[Requirement] = None
     parameters: dict[str, any] = None
+    resolve_instantly: bool = False
     
 Actions = {
     Action.NEXT_PHASE: Action(Action.NEXT_PHASE),

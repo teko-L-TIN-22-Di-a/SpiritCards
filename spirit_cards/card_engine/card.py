@@ -11,3 +11,6 @@ class Card:
     asset_key: str
     attack: int
     health: int
+
+    resource_capacity: int
+    cost: int

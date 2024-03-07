@@ -6,6 +6,7 @@ from spirit_cards.card_engine.action_instance import ActionInstance
 from spirit_cards.card_engine.card_engine import CardEngine
 from spirit_cards.card_engine.card_player import CardPlayer
 from spirit_cards.card_engine.round_state import RoundState
+from spirit_cards.card_engine.slot import Slot
 
 from spirit_cards.core.context import Context
 from spirit_cards.core.entity import Entity
@@ -45,7 +46,7 @@ class BoardRenderer(Entity):
 
     def update(self, delta: float) -> None:
         self.player1_side.update()
-        self.player1_side.update()
+        self.player2_side.update()
 
     def render(self, delta: float) -> None:
 
@@ -54,7 +55,7 @@ class BoardRenderer(Entity):
         player2_mouse_pos = mouse_pos - pygame.Vector2(self.player2_side.get_local_rect().topleft)
         player1_mouse_pos = mouse_pos - pygame.Vector2(self.player1_side.get_local_rect().topleft)
 
-        self._surface.blit(self.player2_side.draw_to_surface(player2_mouse_pos, True), self.player2_side.get_rect())
+        self._surface.blit(self.player2_side.draw_to_surface(player2_mouse_pos, flipped=True, hide_hand=True), self.player2_side.get_rect())
         self._surface.blit(self.player1_side.draw_to_surface(player1_mouse_pos), self.player1_side.get_rect())
         
         self._render_round_info()
@@ -66,7 +67,7 @@ class BoardRenderer(Entity):
             buttons.append(Button(self._context, ButtonConfig(
                 action,
                 action.key,
-                pygame.Vector2(156, 32),
+                pygame.Vector2(182, 32),
                 self._on_click
             )))
 
@@ -87,8 +88,10 @@ class BoardRenderer(Entity):
         self._surface.blit(action_container.get_surface(), action_container.get_pos())
 
     def _on_click(self, action: Action):
-        print(f"Button with tag <{action}> was pressed")
         self._card_engine.round_state.buffer_action(ActionInstance(action, self.following_player, None))
+
+    def _on_slot_click(self, button_context: tuple[Action, Slot]):
+        self._card_engine.round_state.buffer_action(ActionInstance(button_context[0], self.following_player, button_context[1]))
 
     def _render_round_info(self):
         center = pygame.Vector2(self.middle_component.get_rect().center)
@@ -111,11 +114,13 @@ class BoardRenderer(Entity):
         self.player1_side = BoardSide(pygame.Rect(
             0,board_size.y + BoardRenderer.BOARD_SPACE_BETWEEN,
             board_size.x, board_size.y   
-        ), player1, self._context)
+        ), player1, self.following_player, self._context)
+        self.player1_side.on_slot_click = self._on_slot_click
         self.player2_side = BoardSide(pygame.Rect(
             0,0,
             board_size.x, board_size.y   
-        ), player2, self._context)
+        ), player2, self.following_player, self._context)
+        self.player2_side.on_slot_click = self._on_slot_click
 
         self.middle_component = UIComponent(pygame.Rect(
             0, self.player2_side.rect.bottom,

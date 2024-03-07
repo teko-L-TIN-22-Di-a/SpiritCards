@@ -1,9 +1,12 @@
 
 from spirit_cards.card_engine.action import Action, Actions
+from spirit_cards.card_engine.action_handler import ActionHandler
 from spirit_cards.card_engine.action_instance import ActionInstance
 from spirit_cards.card_engine.board_context import BoardContext
 from spirit_cards.card_engine.card_player import CardPlayer, PlayerState
 from spirit_cards.card_engine.requirement import Requirement
+from spirit_cards.card_engine.requirement_handler import RequirementHandler
+from spirit_cards.card_engine.requirement_instance import RequirementInstance
 from spirit_cards.card_engine.slot import Slot
 from spirit_cards.core.state_machine.state_machine import State, StateMachine
 
@@ -21,13 +24,17 @@ class RoundStateHandler(StateMachine):
 
         super().__init__(states, RoundState.REFRESH_PHASE)
 
+    def select_slot(self, slot: Slot) -> None:
+        current_state: RoundState = self.current_state
+        return current_state.select_slot(slot)
+
     def buffer_action(self, action: ActionInstance) -> None:
         current_state: RoundState = self.current_state
         return current_state.buffer_action(action)
 
-    def get_legal_actions(self, slot: Slot) -> list[Action]:
+    def get_legal_actions(self, slot: Slot, player: CardPlayer) -> list[Action]:
         current_state: RoundState = self.current_state
-        return current_state.get_legal_actions(slot)
+        return current_state.get_legal_actions(slot, player)
     
     def get_actions(self, player: CardPlayer) -> list[Action]:
         if(player.state == PlayerState.IDLE):
@@ -51,8 +58,12 @@ class RoundState(State):
     action_stack: list[ActionInstance]
 
     board_context: BoardContext
+    action_handler: ActionHandler
+    requriement_handler: RequirementHandler
 
     def __init__(self, board_context: BoardContext, current_phase: str, next_phase_key):
+        self.action_handler = ActionHandler(board_context)
+        self.requriement_handler = RequirementHandler(board_context)
         self.board_context = board_context
         self.action_stack = []
         self.current_phase = current_phase
@@ -60,22 +71,45 @@ class RoundState(State):
 
     def enter(self, msg: dict) -> None:
         self.action_stack = []
+        self.clear_resources()
+
+    def select_slot(self, slot: Slot) -> None:
+        requirement = self.get_current_requirement()
+
+        if(requirement is None):
+            print("RoundState | Treid to set value on requirement but no requirement found.")
+            return
+        
+        requirement.value = slot
 
     def buffer_action(self, action: ActionInstance):
 
+        if(action.action.resolve_instantly):
+            self.action_handler.resolve_action(action)
+            return
+
         if(action.action.key == Action.CANCEL_ACTION):
             self.buffered_action = None
+            return
+        
+        if(self.buffered_action is not None):
+            print(f"Roundstate | Buffered {action.action.key}, but {self.buffered_action.action.key} is still pending.")
+            return
 
         self.buffered_action = action
 
-    def get_legal_actions(self, slot: Slot) -> list[Action]:
+    def get_legal_actions(self, slot: Slot, player: CardPlayer) -> list[Action]:
         if(slot.card is None):
             return []
         
         actions: list[Action] = []
 
         for action in slot.card.actions:
-            if(self.current_phase in action.availability):
+            if(action.only_playing and player != self.board_context.player):
+                continue
+
+            if(self.current_phase in action.phase_availability
+               and slot.type in action.placement_requirements):
                 actions.append(action)
 
         return actions
@@ -83,11 +117,14 @@ class RoundState(State):
     def get_actions(self, player: CardPlayer) -> list[Action]:    
         actions = []
 
-        if(len(self.action_stack) <= 0 and self.buffered_action is None):
-            actions.append(Action(Action.NEXT_PHASE))
+        if(self.buffered_action is not None and self.buffered_action.source == player):
+            return [Action(Action.CANCEL_ACTION)]
+
+        if(len(self.action_stack) <= 0):
+            return [Action(Action.NEXT_PHASE)]
         
-        if(len(self.action_stack) > 0 and self.buffered_action is None):
-            actions.append(Action(Action.NO_ACT))
+        if(len(self.action_stack) > 0):
+            return [Action(Action.NO_ACT)]
 
         return actions
 
@@ -96,9 +133,28 @@ class RoundState(State):
         pass
 
     def process_actions(self):
+        self.deactivate_all()
         self.process_requirement()
         self.process_reaction()
         self.process_action()
+
+    def deactivate_all(self):
+        slots = [
+            *self.board_context.player1.battle_slots,
+            *self.board_context.player1.support_slots,
+            *self.board_context.player1.hand,
+            *self.board_context.player1.grave_slots,
+
+            *self.board_context.player2.battle_slots,
+            *self.board_context.player2.support_slots,
+            *self.board_context.player2.hand,
+            *self.board_context.player2.grave_slots
+        ]
+        self.set_slot_status(slots, False)
+
+    def set_slot_status(self, slots: list[Slot], status: bool) -> None:
+        for slot in slots:
+            slot.active = status
 
     def process_requirement(self):
         if(self.buffered_action is None):
@@ -108,6 +164,14 @@ class RoundState(State):
             self.resolve_requirement_stack()
             self.action_stack.append(self.buffered_action)
             self.buffered_action = None
+            return
+        
+        for requirement in self.buffered_action.requirements:
+
+            self.requriement_handler.handle_requirement(requirement, self.buffered_action)
+
+            if(requirement.value is None):
+                return # Prematurely quite requirement check if no value was provided.
 
         # TODO Implement way of resolving single requirements
 
@@ -141,7 +205,7 @@ class RoundState(State):
     def resolve_requirement_stack(self):
         pass
 
-    def resolve_action_stack(self):
+    def resolve_action_stack(self) -> None:
 
         while(len(self.action_stack) > 0):
             
@@ -149,12 +213,28 @@ class RoundState(State):
 
             if(current_action.action.key == Action.NEXT_PHASE):
                 self.transition_to(self.next_phase)
+                return
+            
+            self.action_handler.resolve_action(current_action)
+
+    def get_current_requirement(self) -> RequirementInstance:
+        if(self.buffered_action is None):
+            print("RoundState | Tried to get requirement but there is no buffered action.")
+            return None
+
+        for requirement in self.buffered_action.requirements:
+            if(requirement.value is None): return requirement
+
+        return None
 
     def swap_players(self):
         player = self.board_context.player
         self.board_context.player = self.board_context.opponent
         self.board_context.opponent = player
-        
+
+    def clear_resources(self):
+        self.board_context.player1.resources = 0
+        self.board_context.player2.resources = 0
 
 class RefreshPhase(RoundState):
 
@@ -162,7 +242,7 @@ class RefreshPhase(RoundState):
         super().__init__(board_context, RoundState.REFRESH_PHASE, RoundState.MAIN_PHASE)
 
     def enter(self, msg: dict) -> None:
-
+        super().enter(msg)
         if(self.board_context.round_count != 1):
             self.board_context.player.draw_card()
 
@@ -202,6 +282,7 @@ class EndPhase(RoundState):
         super().__init__(board_context, RoundState.END_PHASE, RoundState.REFRESH_PHASE)
 
     def enter(self, msg: dict) -> None:
+        super().enter(msg)
         self.action_stack.append(ActionInstance(Actions[Action.NEXT_PHASE], None, None))
         self.action_stack.append(ActionInstance(Actions[Action.ON_END], None, None))
 

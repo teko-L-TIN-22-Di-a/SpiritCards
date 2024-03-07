@@ -18,7 +18,11 @@ class ActionInstance:
         self.action = action
         self.source = source
         self.slot = slot
-        self.requirements = []
+        self.requirements = [RequirementInstance(requirement, None) for requirement in action.requirements or []]
 
     def is_complete(self) -> bool:
-        return len(self.requirements) == len(self.action.requirements or [])
+
+        for requirement in self.requirements:
+            if(requirement.value is None): return False
+
+        return True

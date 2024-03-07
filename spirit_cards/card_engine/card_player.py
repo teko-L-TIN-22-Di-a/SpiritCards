@@ -19,16 +19,20 @@ class CardPlayer:
     support_slots: list[Slot]
     grave_slots: list[Slot]
 
+    health: int = 20
+    resources: int
+
     state: PlayerState = PlayerState.IDLE
     is_dead: bool = False
 
     def __init__(self, deck: list[Card]):
+        self.resources = 0
         self.deck = deck
         self.current_deck = []
 
         self.hand = []
-        self.battle_slots = [Slot() for _ in range(0, BoardConstants.BATTLE_SLOT_COUNT)]
-        self.support_slots = [Slot() for _ in range(0, BoardConstants.SUPPORT_SLOT_COUNT)]
+        self.battle_slots = [Slot(Slot.BATTLE_SLOT) for _ in range(0, BoardConstants.BATTLE_SLOT_COUNT)]
+        self.support_slots = [Slot(Slot.SUPPORT_SLOT) for _ in range(0, BoardConstants.SUPPORT_SLOT_COUNT)]
         self.grave_slots = []
 
     def start_game(self) -> None:
@@ -44,4 +48,4 @@ class CardPlayer:
             self.is_dead = True
             return
 
-        self.hand.append(Slot(self.current_deck.pop()))
+        self.hand.append(Slot(Slot.HAND_SLOT, self.current_deck.pop()))
