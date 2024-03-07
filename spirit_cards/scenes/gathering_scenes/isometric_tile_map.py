@@ -1,16 +1,9 @@
-
-import random
 import pygame
 from spirit_cards.services.asset_manager import AssetManager
 from spirit_cards.asset_map import AssetMap
 from spirit_cards.services.global_services import GlobalServices
 from spirit_cards.core.context import Context
-from dataclasses import dataclass
-
-@dataclass
-class Tile:
-    position: pygame.Vector3
-    accessible: bool = True
+from spirit_cards.scenes.gathering_scenes.isometric_tile import IsometricTile
 
 class IsometricTileMap:
 
@@ -20,7 +13,7 @@ class IsometricTileMap:
     asset_manager: AssetManager
     map_description: list[list[int]]
     tile_size: pygame.Vector3
-    tile_map: list[list[Tile]]
+    tile_map: list[list[IsometricTile]]
     map_size: pygame.Vector3
 
     # tile_size x, y and z is reserved for the full height
@@ -31,7 +24,7 @@ class IsometricTileMap:
         self.tile_size = pygame.Vector3(tile_size_tuple)
 
         self.tile_map = [
-            [Tile(pygame.Vector3(x, 1, z)) for z in range(0,int(self.map_size.z))] for x in range(0,int(self.map_size.x))
+            [IsometricTile(pygame.Vector3(x, 1, z)) for z in range(0,int(self.map_size.z))] for x in range(0,int(self.map_size.x))
         ]
 
     def create_tile_array(self, map_description):
@@ -58,10 +51,13 @@ class IsometricTileMap:
         
         x_width = self.map_size.x * (self.tile_size.x/2)
         z_width = self.map_size.z * (self.tile_size.x/2)
+        y_component_x = self.map_size.x*self.tile_size.y/2
+        y_component_z = self.map_size.z*self.tile_size.y/2
+        y_padding = 50
 
         map_surface_size = pygame.Vector2(
             x_width + z_width,
-            max(self.map_size.x, self.map_size.z) * (self.tile_size.y) + self.tile_size.z
+            y_component_x + y_component_z + y_padding
         )
 
         # self._surface = pygame.surface.Surface((map_surface_size.x, map_surface_size.y), pygame.SRCALPHA)
