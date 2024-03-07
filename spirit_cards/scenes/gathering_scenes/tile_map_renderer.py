@@ -44,7 +44,9 @@ class TileMapRenderer(Entity):
 
         for entity in isometric_entities:
             entity.set_bounds(self._tile_map.bounds)
-            draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset
+            entity.set_colliders(self._tile_map.colliders)
+            draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset + entity.offset
+            pygame.draw.circle(self._surface, "red", draw_pos, 10)
             self._surface.blit(entity.surface, draw_pos)
 
     def cleanup(self) -> None:
@@ -55,7 +57,7 @@ class TileMapRenderer(Entity):
         tile_offset = self._tile_map.tile_size.xy / -2 # From center coordinate of tile to top left of tile for rendering.
 
         for x, row in enumerate(self._tile_map.tile_map):
-            row.reverse() # fit tile drawing order to map descripton
+            #row.reverse() # fit tile drawing order to map descripton
             for z, item in enumerate(row):
                 screen_pos = self._tile_map.to_screen_space(pygame.Vector3(x, item.map_position.y, z))
                 self._tile_map.tile_map[x][z].set_screen_position(screen_pos)

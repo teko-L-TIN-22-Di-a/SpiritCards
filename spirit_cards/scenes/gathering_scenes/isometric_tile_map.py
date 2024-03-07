@@ -20,12 +20,14 @@ class IsometricTileMap:
     # tile_size x, y and z is reserved for the full height
     def __init__(self, context: Context, map_description: list[list[int]]):
         self.asset_manager = context.get_service(GlobalServices.ASSET_MANAGER)
+        self.colliders = []
         self.tile_map = self.create_tile_map(map_description)
         self.map_size = pygame.Vector3(len(map_description), 1, len(map_description[0]))
         _tile_size = pygame.Vector2(self.tile_map[0][0].texture.get_size())
         self.tile_size = pygame.Vector3(_tile_size.x, 100, _tile_size.y)
-        self.bounds = pygame.rect.Rect(0, 0, self.map_size.x, self.map_size.z)
-        self.colliders = []
+        _tile_offset = pygame.Vector2(0.5, 0.5).length()
+        self.bounds = pygame.rect.Rect(0, 0, self.map_size.x*_tile_offset, self.map_size.z*_tile_offset)
+        
 
     def create_tile_map(self, map_description):
         
@@ -40,7 +42,7 @@ class IsometricTileMap:
                 if len(tile_map[x]) < z + 1:
                     tile_map[x].append(0)
                 if not tile.accessible:
-                    pass
+                    self.colliders.append(pygame.rect.Rect(x,z,1,1))
                 tile_map[x][z] = tile
 
         return tile_map
@@ -49,9 +51,9 @@ class IsometricTileMap:
 
         tile_name = "TILE"+str(tile_id)
         asset = AssetMap.__getattribute__(AssetMap, tile_name)
-        texture = self.asset_manager.get_image(asset)
+        texture = self.asset_manager.get_image(asset[0])
         
-        return IsometricTile(pygame.Vector3(tile_row,1,tile_column), texture)
+        return IsometricTile(pygame.Vector3(tile_row,1,tile_column), texture, asset[1])
 
     def get_map_texture(self) -> pygame.surface.Surface:
 
