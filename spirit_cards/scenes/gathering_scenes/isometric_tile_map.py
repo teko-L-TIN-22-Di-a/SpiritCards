@@ -27,7 +27,7 @@ class IsometricTileMap:
     def __init__(self, context: Context, map_description: list[list[int]], tile_size_tuple: tuple[int, int, int] | pygame.Vector3):
         self.asset_manager = context.get_service(GlobalServices.ASSET_MANAGER)
         self.tile_array = self.create_tile_array(map_description)
-        self.map_size = pygame.Vector3(len(map_description[0]), 1, len(map_description))
+        self.map_size = pygame.Vector3(len(map_description), 1, len(map_description[0]))
         self.tile_size = pygame.Vector3(tile_size_tuple)
 
         self.tile_map = [
@@ -61,7 +61,7 @@ class IsometricTileMap:
 
         map_surface_size = pygame.Vector2(
             x_width + z_width,
-            max(self.map_size.x, self.map_size.z) * (self.tile_size.y / 2) + self.tile_size.z
+            max(self.map_size.x, self.map_size.z) * (self.tile_size.y) + self.tile_size.z
         )
 
         # self._surface = pygame.surface.Surface((map_surface_size.x, map_surface_size.y), pygame.SRCALPHA)

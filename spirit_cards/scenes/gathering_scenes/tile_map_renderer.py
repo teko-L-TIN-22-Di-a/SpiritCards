@@ -64,4 +64,4 @@ class TileMapRenderer(Entity):
         for x, row in enumerate(self._tile_map.tile_map):
             for z, item in enumerate(row):
                 screen_pos = self._tile_map.to_screen_space(pygame.Vector3(x, item.position.y, z))
-                surface.blit(self._tile_map.tile_array[x-1][z-1], screen_pos + tile_offset)
+                surface.blit(self._tile_map.tile_array[x][z], screen_pos + tile_offset)
