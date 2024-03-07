@@ -18,4 +18,7 @@ class IsometricEntity(Entity):
         self.surface = surface
 
     def flip_surface(self):
-        self.surface = pygame.transform.flip(self.surface,True,False)
+        self.surface = pygame.transform.flip(self.surface, True, False)
+
+    def set_bounds(self, bounds: pygame.rect):
+        self.bounds = bounds

@@ -14,13 +14,18 @@ class IsometricTileMap:
     tile_map: list[list[IsometricTile]]
     map_size: pygame.Vector3
     tile_size: pygame.Vector3
+    bounds: pygame.rect.Rect
+    colliders: list[pygame.rect.Rect]
 
     # tile_size x, y and z is reserved for the full height
-    def __init__(self, context: Context, map_description: list[list[int]], tile_size_tuple: tuple[int, int, int] | pygame.Vector3):
+    def __init__(self, context: Context, map_description: list[list[int]]):
         self.asset_manager = context.get_service(GlobalServices.ASSET_MANAGER)
         self.tile_map = self.create_tile_map(map_description)
         self.map_size = pygame.Vector3(len(map_description), 1, len(map_description[0]))
-        self.tile_size = pygame.Vector3(tile_size_tuple)
+        _tile_size = pygame.Vector2(self.tile_map[0][0].texture.get_size())
+        self.tile_size = pygame.Vector3(_tile_size.x, 100, _tile_size.y)
+        self.bounds = pygame.rect.Rect(0, 0, self.map_size.x, self.map_size.z)
+        self.colliders = []
 
     def create_tile_map(self, map_description):
         
@@ -34,7 +39,8 @@ class IsometricTileMap:
                     tile_map.append([])
                 if len(tile_map[x]) < z + 1:
                     tile_map[x].append(0)
-
+                if not tile.accessible:
+                    pass
                 tile_map[x][z] = tile
 
         return tile_map

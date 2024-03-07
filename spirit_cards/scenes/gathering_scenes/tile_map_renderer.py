@@ -9,8 +9,6 @@ from spirit_cards.scenes.gathering_scenes.follow_camera import FollowCamera
 from spirit_cards.scenes.gathering_scenes.gathering_services import GatheringServices
 from spirit_cards.scenes.gathering_scenes.isometric_entity import IsometricEntity
 from spirit_cards.scenes.gathering_scenes.isometric_tile_map import IsometricTileMap
-from spirit_cards.services.asset_manager import AssetManager
-from spirit_cards.services.global_services import GlobalServices
 from spirit_cards.scenes.gathering_scenes.map_description import desc
 
 
@@ -25,12 +23,8 @@ class TileMapRenderer(Entity):
     def __init__(self, context: Context):
         self._surface = context.get_service(PygameServices.SCREEN_SURFACE)
         self._entity_manager = context.get_service(GatheringServices.ENTITY_MANAGER)
-        asset_manager: AssetManager = context.get_service(GlobalServices.ASSET_MANAGER)
         
-        self._tile_texture = asset_manager.get_image(AssetMap.TILE1)
-        tile_size = pygame.Vector2(self._tile_texture.get_size())
-        
-        self._tile_map = IsometricTileMap(context, desc, (tile_size.x, 100, tile_size.y))
+        self._tile_map = IsometricTileMap(context, desc)
 
         print("Prerendering Map")
         self._pre_draw_map()
@@ -49,6 +43,7 @@ class TileMapRenderer(Entity):
         isometric_entities: list[IsometricEntity] = self._entity_manager.get_filtered(IsometricEntity.TAG)
 
         for entity in isometric_entities:
+            entity.set_bounds(self._tile_map.bounds)
             draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset
             self._surface.blit(entity.surface, draw_pos)
 
@@ -57,7 +52,6 @@ class TileMapRenderer(Entity):
 
     def _pre_draw_map(self) -> None:
         surface = self._tile_map.get_map_texture()
-
         tile_offset = self._tile_map.tile_size.xy / -2 # From center coordinate of tile to top left of tile for rendering.
 
         for x, row in enumerate(self._tile_map.tile_map):

@@ -14,6 +14,7 @@ class GatheringPlayer(IsometricEntity):
         super().__init__(pygame.Vector3(0,1,0))
         asset_manager: AssetManager = context.get_service(GlobalServices.ASSET_MANAGER)
         self.surface = asset_manager.get_image(AssetMap.TEST_SPRITE_PLAYER)
+        print(self.position)
 
     def update(self, delta: float) -> None:
 
@@ -38,8 +39,10 @@ class GatheringPlayer(IsometricEntity):
 
         if(temp_movement.length() != 0):
             # Rotate movement from isometric towards camera to make it less awkward.
-            self.position += temp_movement.rotate_y(45).normalize() * speed
-            
+            position = self.position + temp_movement.rotate_y(45).normalize() * speed
+            print(position)
+            if self.bounds.collidepoint(position.x, position.z):
+                self.position = position
 
     def cleanup(self) -> None:
         pass
