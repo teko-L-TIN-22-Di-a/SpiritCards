@@ -29,7 +29,6 @@ class TileMapRenderer(Entity):
         
         self._tile_texture = asset_manager.get_image(AssetMap.TILE1)
         tile_size = pygame.Vector2(self._tile_texture.get_size())
-        # TODO dynamic tilemap
         
         self._tile_map = IsometricTileMap(context, desc, (tile_size.x, 100, tile_size.y))
 
@@ -62,6 +61,8 @@ class TileMapRenderer(Entity):
         tile_offset = self._tile_map.tile_size.xy / -2 # From center coordinate of tile to top left of tile for rendering.
 
         for x, row in enumerate(self._tile_map.tile_map):
+            row.reverse() # fit tile drawing order to map descripton
             for z, item in enumerate(row):
-                screen_pos = self._tile_map.to_screen_space(pygame.Vector3(x, item.position.y, z))
-                surface.blit(self._tile_map.tile_array[x][z], screen_pos + tile_offset)
+                screen_pos = self._tile_map.to_screen_space(pygame.Vector3(x, item.map_position.y, z))
+                self._tile_map.tile_map[x][z].set_screen_position(screen_pos)
+                surface.blit(self._tile_map.tile_map[x][z].texture, screen_pos + tile_offset)

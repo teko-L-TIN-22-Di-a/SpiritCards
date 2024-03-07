@@ -11,37 +11,44 @@ class IsometricTileMap:
     _surface: pygame.surface.Surface = None
 
     asset_manager: AssetManager
-    map_description: list[list[int]]
-    tile_size: pygame.Vector3
     tile_map: list[list[IsometricTile]]
     map_size: pygame.Vector3
+    tile_size: pygame.Vector3
 
     # tile_size x, y and z is reserved for the full height
     def __init__(self, context: Context, map_description: list[list[int]], tile_size_tuple: tuple[int, int, int] | pygame.Vector3):
         self.asset_manager = context.get_service(GlobalServices.ASSET_MANAGER)
-        self.tile_array = self.create_tile_array(map_description)
+        self.tile_map = self.create_tile_map(map_description)
         self.map_size = pygame.Vector3(len(map_description), 1, len(map_description[0]))
         self.tile_size = pygame.Vector3(tile_size_tuple)
 
-        self.tile_map = [
-            [IsometricTile(pygame.Vector3(x, 1, z)) for z in range(0,int(self.map_size.z))] for x in range(0,int(self.map_size.x))
-        ]
-
-    def create_tile_array(self, map_description):
-        tile_array = [[]]
+    def create_tile_map(self, map_description):
+        
+        tile_map = [[]]
         for x, row in enumerate(map_description):
-            for y, tile in enumerate(row):
-                tile_name = "TILE"+str(tile)
-                asset = AssetMap.__getattribute__(AssetMap, tile_name)
-                texture = self.asset_manager.get_image(asset)
-                if len(tile_array) < x + 1:
-                    tile_array.append([])
-                if len(tile_array[x]) < y + 1:
-                    tile_array[x].append(0)
-                tile_array[x][y] = texture
-        return tile_array
+            for z, column in enumerate(row):
+                tile = self.create_tile(column, x, z)
+
+                # check tile_map array size and expand it, when necessary
+                if len(tile_map) < x + 1:
+                    tile_map.append([])
+                if len(tile_map[x]) < z + 1:
+                    tile_map[x].append(0)
+
+                tile_map[x][z] = tile
+
+        return tile_map
+
+    def create_tile(self, tile_id: int, tile_row: int, tile_column: int) -> IsometricTile:
+
+        tile_name = "TILE"+str(tile_id)
+        asset = AssetMap.__getattribute__(AssetMap, tile_name)
+        texture = self.asset_manager.get_image(asset)
+        
+        return IsometricTile(pygame.Vector3(tile_row,1,tile_column), texture)
 
     def get_map_texture(self) -> pygame.surface.Surface:
+
         if (self._surface is None or self._surface_dirty):
             self.regenerate_surface()
 
@@ -60,7 +67,6 @@ class IsometricTileMap:
             y_component_x + y_component_z + y_padding
         )
 
-        # self._surface = pygame.surface.Surface((map_surface_size.x, map_surface_size.y), pygame.SRCALPHA)
         self._surface = pygame.surface.Surface((map_surface_size.x, map_surface_size.y))
         self._surface.fill("green")
 
