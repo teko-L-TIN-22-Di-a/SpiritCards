@@ -25,8 +25,7 @@ class IsometricTileMap:
         self.map_size = pygame.Vector3(len(map_description), 1, len(map_description[0]))
         _tile_size = pygame.Vector2(self.tile_map[0][0].texture.get_size())
         self.tile_size = pygame.Vector3(_tile_size.x, 100, _tile_size.y)
-        _tile_offset = pygame.Vector2(0.5, 0.5).length()
-        self.bounds = pygame.rect.Rect(0, 0, self.map_size.x*_tile_offset, self.map_size.z*_tile_offset)
+        self.bounds = pygame.Rect(0, 0, self.map_size.x, self.map_size.z)
         
 
     def create_tile_map(self, map_description):

@@ -40,12 +40,14 @@ class TileMapRenderer(Entity):
         map_offset = pygame.Vector2(map_texture.get_size()) / -2 + pygame.Vector2(camera.bounds.center)
         self._surface.blit(self._tile_map.get_map_texture(), map_offset)
 
+        tile_offset = pygame.Vector2(5,30)
+
         isometric_entities: list[IsometricEntity] = self._entity_manager.get_filtered(IsometricEntity.TAG)
 
         for entity in isometric_entities:
             entity.set_bounds(self._tile_map.bounds)
             entity.set_colliders(self._tile_map.colliders)
-            draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset + entity.offset
+            draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset - tile_offset + entity.offset
             pygame.draw.circle(self._surface, "red", draw_pos, 10)
             self._surface.blit(entity.surface, draw_pos)
 
