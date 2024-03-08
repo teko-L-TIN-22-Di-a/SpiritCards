@@ -6,6 +6,7 @@ class IsometricTile:
     texture: pygame.surface.Surface
     accessible: bool = True
     screen_position: pygame.Vector2
+    non_accessible: list = [3,8,9,11,12]
 
     def __init__(self, map_position: pygame.Vector3, texture: pygame.surface.Surface, accessible: bool = True) -> None:
         self.map_position = map_position
@@ -15,8 +16,3 @@ class IsometricTile:
 
     def set_screen_position(self, position: pygame.Vector2):
         self.screen_position = position
-    
-    def circel_collider(self, point: pygame.Vector2):
-        if point.distance_to(self.screen_position) < 50:
-            return True
-        else: return False

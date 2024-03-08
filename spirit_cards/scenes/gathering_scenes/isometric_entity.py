@@ -12,12 +12,12 @@ class IsometricEntity(Entity):
     surface: pygame.Surface
     colliders: list[pygame.Rect]
 
-    def __init__(self, position: pygame.Vector3, direction: bool = True, bounds: pygame.Rect = None, surface: pygame.Surface = None):
+    def __init__(self, position: pygame.Vector3, surface: pygame.Surface, direction: bool = True, bounds: pygame.Rect = None):
         self.position = position
         self.direction = direction
         self.bounds = bounds
         self.surface = surface
-        self.offset = pygame.Vector2(0, 0)
+        self.offset = pygame.Vector2(surface.get_size())
         self.colliders = []
 
     def flip_surface(self):

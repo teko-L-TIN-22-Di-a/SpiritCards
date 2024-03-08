@@ -11,9 +11,9 @@ from spirit_cards.scenes.gathering_scenes.isometric_entity import IsometricEntit
 
 class GatheringPlayer(IsometricEntity):
     def __init__(self, context: Context):
-        super().__init__(pygame.Vector3(0,1,0))
         asset_manager: AssetManager = context.get_service(GlobalServices.ASSET_MANAGER)
         self.surface = asset_manager.get_image(AssetMap.TEST_SPRITE_PLAYER)
+        super().__init__(pygame.Vector3(0,1,0), self.surface)
         self.offset = -pygame.Vector2(self.surface.get_size())
         print(self.position)
 

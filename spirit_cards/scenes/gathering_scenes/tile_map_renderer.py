@@ -47,7 +47,7 @@ class TileMapRenderer(Entity):
         for entity in isometric_entities:
             entity.set_bounds(self._tile_map.bounds)
             entity.set_colliders(self._tile_map.colliders)
-            draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset - tile_offset + entity.offset
+            draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset + entity.offset
             pygame.draw.circle(self._surface, "red", draw_pos, 10)
             self._surface.blit(entity.surface, draw_pos)
 

@@ -50,9 +50,12 @@ class IsometricTileMap:
 
         tile_name = "TILE"+str(tile_id)
         asset = AssetMap.__getattribute__(AssetMap, tile_name)
-        texture = self.asset_manager.get_image(asset[0])
+        texture = self.asset_manager.get_image(asset)
+        access = True
+        if tile_id in IsometricTile.non_accessible:
+            access = False
         
-        return IsometricTile(pygame.Vector3(tile_row,1,tile_column), texture, asset[1])
+        return IsometricTile(pygame.Vector3(tile_row,1,tile_column), texture, access)
 
     def get_map_texture(self) -> pygame.surface.Surface:
 
