@@ -10,6 +10,9 @@ from spirit_cards.scenes.gathering_scenes.isometric_entity import IsometricEntit
 
 
 class GatheringPlayer(IsometricEntity):
+
+    TAG = "player"
+
     def __init__(self, context: Context):
         asset_manager: AssetManager = context.get_service(GlobalServices.ASSET_MANAGER)
         self.surface = asset_manager.get_image(AssetMap.TEST_SPRITE_PLAYER)
