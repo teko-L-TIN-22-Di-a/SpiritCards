@@ -39,7 +39,7 @@ class CardPlayer:
         self.current_deck = self.deck.copy()
         random.shuffle(self.current_deck)
 
-        for i in range(0, 8):
+        for i in range(0, BoardConstants.HAND_SIZE):
             self.draw_card()
 
     def draw_card(self) -> None:
