@@ -43,12 +43,18 @@ class TileMapRenderer(Entity):
 
         tile_offset = pygame.Vector2(5,30)
 
-        isometric_entities: list[IsometricEntity] = self._entity_manager.get_filtered(IsometricEntity.TAG)
+        player_entity: GatheringPlayer = self._entity_manager.get_filtered(GatheringPlayer.TAG)[0]
+        player_entity.set_bounds(self._tile_map.bounds)
+        player_entity.set_colliders(self._tile_map.colliders)
+        draw_pos = self._tile_map.to_screen_space(player_entity.position) + map_offset + player_entity.offset
+        self._surface.blit(player_entity.surface, draw_pos)
+
+        '''isometric_entities: list[IsometricEntity] = self._entity_manager.get_filtered(IsometricEntity.TAG)
         for entity in isometric_entities:
             entity.set_bounds(self._tile_map.bounds)
             entity.set_colliders(self._tile_map.colliders)
             draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset + entity.offset
-            self._surface.blit(entity.surface, draw_pos)
+            self._surface.blit(entity.surface, draw_pos)'''
 
     def cleanup(self) -> None:
         pass
