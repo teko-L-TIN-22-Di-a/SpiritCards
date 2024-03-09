@@ -91,3 +91,13 @@ class IsometricTileMap:
 
         return x_part + z_part + y_part + surface_offset + leaning_offset
     
+    def isometric_movement(self, position:pygame.Vector3):
+        x_part = pygame.Vector2((self.tile_size.x / 2) * position.x, (self.tile_size.y / 2) * position.x)
+        z_part = pygame.Vector2((-self.tile_size.x / 2) * position.z, (self.tile_size.y / 2) * position.z)
+        y_part = pygame.Vector2(0, (self.tile_size.y / 2) * position.y)
+
+        surface_offset = pygame.Vector2(self._surface.get_width() / 2, 0)
+        leaning_offset = pygame.Vector2((self.map_size.z - self.map_size.x) * self.tile_size.x / 4, 0)
+
+        return x_part + z_part + y_part   
+    
