@@ -38,7 +38,7 @@ class GatheringScene(Scene):
 
         self._entity_manager.register(FollowCamera(self._scoped_context), [FollowCamera.TAG])
         self._entity_manager.register(TileMapRenderer(self._scoped_context))
-        self._entity_manager.register(GatheringPlayer(self._scoped_context), [GatheringPlayer.TAG])
+        self._entity_manager.register(GatheringPlayer(self._scoped_context), [IsometricEntity.TAG])
 
     def process(self, delta: int) -> None:
     

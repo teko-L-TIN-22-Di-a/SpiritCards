@@ -38,24 +38,16 @@ class TileMapRenderer(Entity):
         camera: FollowCamera = self._entity_manager.get_filtered(FollowCamera.TAG)[0]
 
         map_texture = self._tile_map.get_map_texture()
-        map_offset_vector = pygame.Vector2(self._tile_map.bounds.size)
-        map_offset = self._tile_map.to_screen_space(pygame.Vector3(0,1,0))
-        map_offset = pygame.Vector2(0,0)
+        map_offset = pygame.Vector2(map_texture.get_size()) / -2 + pygame.Vector2(camera.bounds.center)
+        self._surface.blit(self._tile_map.get_map_texture(), map_offset)
 
         tile_offset = pygame.Vector2(5,30)
-
-        player_entity: GatheringPlayer = self._entity_manager.get_filtered(GatheringPlayer.TAG)[0]
-        player_entity.set_bounds(self._tile_map.bounds)
-        player_entity.set_colliders(self._tile_map.colliders)
-        
-        self._surface.blit(map_texture, map_offset)
-        self._surface.blit(player_entity.surface, pygame.Vector2(camera.bounds.center))
 
         isometric_entities: list[IsometricEntity] = self._entity_manager.get_filtered(IsometricEntity.TAG)
         for entity in isometric_entities:
             entity.set_bounds(self._tile_map.bounds)
             entity.set_colliders(self._tile_map.colliders)
-            draw_pos = self._tile_map.to_screen_space(entity.position) + entity.offset
+            draw_pos = self._tile_map.to_screen_space(entity.position) + map_offset + entity.offset
             self._surface.blit(entity.surface, draw_pos)
 
     def cleanup(self) -> None:
