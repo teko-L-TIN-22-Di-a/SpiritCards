@@ -18,7 +18,7 @@ class GatheringPlayer(IsometricEntity):
         self.surface = asset_manager.get_image(AssetMap.TEST_SPRITE_PLAYER)
         super().__init__(pygame.Vector3(0,1,0), self.surface)
         self.offset = -pygame.Vector2(self.surface.get_size())
-        self.temp_movement = pygame.Vector3(0,0,0)
+        self._temp_movement = pygame.Vector3(0,0,0)
         self.camera_movement = pygame.Vector2(0,0)
         print(self.position)
 
@@ -53,7 +53,7 @@ class GatheringPlayer(IsometricEntity):
                 print(self.bounds.collidepoint(position.x, position.z))
                 print(position)
 
-        self.temp_movement = temp_movement
+        self._temp_movement = temp_movement
 
     def check_colliders(self, position: pygame.Vector3):
         for collider in self.colliders:

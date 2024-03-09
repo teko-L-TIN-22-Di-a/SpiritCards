@@ -78,26 +78,20 @@ class IsometricTileMap:
         )
 
         self._surface = pygame.surface.Surface((map_surface_size.x, map_surface_size.y))
-        self._surface.fill("green")
 
     def to_screen_space(self, position: pygame.Vector3) -> pygame.Vector2:
 
-        x_part = pygame.Vector2((self.tile_size.x / 2) * position.x, (self.tile_size.y / 2) * position.x)
-        z_part = pygame.Vector2((-self.tile_size.x / 2) * position.z, (self.tile_size.y / 2) * position.z)
-        y_part = pygame.Vector2(0, (self.tile_size.y / 2) * position.y)
+        x_y_z_parts = self.isometric_movement(position)
 
         surface_offset = pygame.Vector2(self._surface.get_width() / 2, 0)
         leaning_offset = pygame.Vector2((self.map_size.z - self.map_size.x) * self.tile_size.x / 4, 0)
 
-        return x_part + z_part + y_part + surface_offset + leaning_offset
+        return x_y_z_parts + surface_offset + leaning_offset
     
     def isometric_movement(self, position:pygame.Vector3):
         x_part = pygame.Vector2((self.tile_size.x / 2) * position.x, (self.tile_size.y / 2) * position.x)
         z_part = pygame.Vector2((-self.tile_size.x / 2) * position.z, (self.tile_size.y / 2) * position.z)
         y_part = pygame.Vector2(0, (self.tile_size.y / 2) * position.y)
 
-        surface_offset = pygame.Vector2(self._surface.get_width() / 2, 0)
-        leaning_offset = pygame.Vector2((self.map_size.z - self.map_size.x) * self.tile_size.x / 4, 0)
-
-        return x_part + z_part + y_part   
+        return x_part + z_part + y_part
     

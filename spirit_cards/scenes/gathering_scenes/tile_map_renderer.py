@@ -46,10 +46,8 @@ class TileMapRenderer(Entity):
         player_entity: GatheringPlayer = self._entity_manager.get_filtered(GatheringPlayer.TAG)[0]
         player_entity.set_bounds(self._tile_map.bounds)
         player_entity.set_colliders(self._tile_map.colliders)
-        player_entity.camera_movement = self._tile_map.isometric_movement(player_entity.temp_movement)
+        player_entity.camera_movement = self._tile_map.isometric_movement(player_entity._temp_movement)
         draw_pos = self._tile_map.to_screen_space(player_entity.position) + map_offset + player_entity.offset
-
-        #camera.move(player_entity.temp_movement)
 
         self._surface.blit(player_entity.surface, draw_pos)
 
